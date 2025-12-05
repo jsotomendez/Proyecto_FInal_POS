@@ -196,3 +196,4 @@ div > a.btn-primary:hover, div > a.btn-warning:hover {
 .card-header.bg-warning { background-color: #f39c12 !important; color: #fff !important; }
 .btn-primary { background-color: var(--accent-color) !important; border-color: var(--accent-color) !important; }
 .btn-primary:hover { background-color: var(--accent-hover) !important; }
+

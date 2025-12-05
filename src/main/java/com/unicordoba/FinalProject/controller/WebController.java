@@ -4,7 +4,7 @@ import com.unicordoba.FinalProject.dto.DashboardDTO;
 import com.unicordoba.FinalProject.entity.*;
 import com.unicordoba.FinalProject.repository.*;
 import com.unicordoba.FinalProject.service.*;
-import jakarta.servlet.http.HttpServletRequest; // <--- IMPORTANTE: Nueva importación
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Controller;
@@ -39,20 +39,18 @@ public class WebController {
     @Autowired private UsuarioRepository usuarioRepository;
     @Autowired private PromocionRepository promocionRepository;
 
-    // ====================================================================
-    // CORRECCIÓN PARA EL ERROR 500 (THYMELEAF #request)
-    // Este método se ejecuta antes de cualquier petición y pasa la URL actual a la vista
-    // ====================================================================
+
+    private String clean(String s) {
+        return (s == null || s.trim().isEmpty()) ? null : s;
+    }
+
     @ModelAttribute("currentUri")
     public String getCurrentUri(HttpServletRequest request) {
         return request.getRequestURI();
     }
 
-    // ================= INICIO Y DASHBOARD =================
     @GetMapping("/")
-    public String index() {
-        return "redirect:/web/dashboard";
-    }
+    public String index() { return "redirect:/web/dashboard"; }
 
     @GetMapping("/web/dashboard")
     public String dashboard(Model model) {
@@ -62,351 +60,94 @@ public class WebController {
         stats.setProductosBajoStock(inventarioRepository.contarProductosBajoStock());
         stats.setClientesRegistrados(clienteRepository.count());
         model.addAttribute("stats", stats);
-
-        List<Object[]> ventasData = pedidoRepository.obtenerVentasUltimosDias();
-        model.addAttribute("graficoVentas", ventasData);
-
-        List<Object[]> productosTop = orderItemRepository.obtenerProductosMasVendidos();
-        model.addAttribute("graficoProductos", productosTop);
-
+        model.addAttribute("graficoVentas", pedidoRepository.obtenerVentasUltimosDias());
+        model.addAttribute("graficoProductos", orderItemRepository.obtenerProductosMasVendidos());
         return "dashboard";
     }
 
-    // ================= GESTIÓN DE USUARIOS =================
+    // ================= FILTROS CORREGIDOS =================
+
     @GetMapping("/web/usuarios")
     public String listarUsuarios(@RequestParam(required = false) String username,
-                                 @RequestParam(required = false) String rol,
-                                 Model model) {
+                                 @RequestParam(required = false) String rol, Model model) {
+        // Limpiamos los parámetros (convertimos "" a null)
+        username = clean(username);
+        rol = clean(rol);
+
         List<Usuario> lista = (username == null && rol == null) ?
                 usuarioService.obtenerTodos() : usuarioRepository.filtrar(username, rol);
         model.addAttribute("listaUsuarios", lista);
         return "usuarios";
     }
 
-    @GetMapping("/web/usuarios/nuevo")
-    public String formUsuario(Model model) {
-        Usuario u = new Usuario();
-        u.setActivo(true);
-        model.addAttribute("usuario", u);
-        return "nuevo_usuario";
-    }
-
-    @GetMapping("/web/usuarios/editar/{id}")
-    public String editarUsuario(@PathVariable Integer id, Model model) {
-        Usuario u = usuarioService.obtenerPorId(id).orElse(null);
-        model.addAttribute("usuario", u);
-        return "nuevo_usuario";
-    }
-
-    @GetMapping("/web/usuarios/eliminar/{id}")
-    public String eliminarUsuario(@PathVariable Integer id, RedirectAttributes ra) {
-        try {
-            usuarioService.eliminar(id);
-            ra.addFlashAttribute("mensaje", "Usuario eliminado correctamente.");
-        } catch (DataIntegrityViolationException e) {
-            ra.addFlashAttribute("error", "🚫 No se puede eliminar: El usuario tiene ventas o registros asociados.");
-        } catch (Exception e) {
-            ra.addFlashAttribute("error", "Error inesperado al eliminar el usuario.");
-        }
-        return "redirect:/web/usuarios";
-    }
-
-    @PostMapping("/web/usuarios/guardar")
-    public String guardarUsuario(@ModelAttribute("usuario") Usuario usuario, RedirectAttributes ra) {
-        usuarioService.guardar(usuario);
-        ra.addFlashAttribute("mensaje", "Usuario guardado exitosamente.");
-        return "redirect:/web/usuarios";
-    }
-
-    // ================= GESTIÓN DE CLIENTES =================
     @GetMapping("/web/clientes")
-    public String listarClientes(
-            @RequestParam(required = false) String nombre,
-            @RequestParam(required = false) String email,
-            @RequestParam(required = false) String telefono,
-            Model model) {
+    public String listarClientes(@RequestParam(required = false) String nombre,
+                                 @RequestParam(required = false) String email,
+                                 @RequestParam(required = false) String telefono, Model model) {
+        nombre = clean(nombre); email = clean(email); telefono = clean(telefono);
 
-        List<Cliente> lista;
-        if (nombre == null && email == null && telefono == null) {
-            lista = clienteService.obtenerTodos();
-        } else {
-            lista = clienteRepository.buscarConFiltros(nombre, email, telefono);
-        }
+        List<Cliente> lista = (nombre == null && email == null && telefono == null) ?
+                clienteService.obtenerTodos() : clienteRepository.buscarConFiltros(nombre, email, telefono);
         model.addAttribute("listaClientes", lista);
         return "clientes";
     }
 
-    @GetMapping("/web/clientes/nuevo")
-    public String formCliente(Model model) {
-        model.addAttribute("cliente", new Cliente());
-        return "nuevo_cliente";
-    }
-
-    @GetMapping("/web/clientes/editar/{id}")
-    public String editarCliente(@PathVariable Integer id, Model model) {
-        model.addAttribute("cliente", clienteService.obtenerPorId(id).orElse(null));
-        return "nuevo_cliente";
-    }
-
-    @GetMapping("/web/clientes/eliminar/{id}")
-    public String eliminarCliente(@PathVariable Integer id, RedirectAttributes ra) {
-        try {
-            clienteService.eliminarCliente(id);
-            ra.addFlashAttribute("mensaje", "Cliente eliminado.");
-        } catch (Exception e) {
-            ra.addFlashAttribute("error", "No se puede eliminar el cliente (tiene facturas asociadas).");
-        }
-        return "redirect:/web/clientes";
-    }
-
-    @PostMapping("/web/clientes/guardar")
-    public String guardarCliente(@ModelAttribute("cliente") Cliente cliente, RedirectAttributes ra) {
-        clienteService.guardarCliente(cliente);
-        ra.addFlashAttribute("mensaje", "Cliente guardado.");
-        return "redirect:/web/clientes";
-    }
-
-    // ================= PRODUCTOS =================
     @GetMapping("/web/productos")
     public String listarProductos(@RequestParam(required = false) String nombre,
                                   @RequestParam(required = false) BigDecimal minPrecio,
                                   @RequestParam(required = false) BigDecimal maxPrecio,
-                                  @RequestParam(required = false) Boolean activo,
-                                  Model model) {
-        List<Producto> resultados;
-        if (nombre == null && minPrecio == null && maxPrecio == null && activo == null) {
-            resultados = productoService.obtenerTodos();
-        } else {
-            resultados = productoRepository.buscarProductosAvanzado(nombre, minPrecio, maxPrecio, activo);
-        }
+                                  @RequestParam(required = false) Boolean activo, Model model) {
+        nombre = clean(nombre);
+        List<Producto> resultados = (nombre == null && minPrecio == null && maxPrecio == null && activo == null) ?
+                productoService.obtenerTodos() : productoRepository.buscarProductosAvanzado(nombre, minPrecio, maxPrecio, activo);
         model.addAttribute("listaProductos", resultados);
         return "productos";
     }
 
-    @GetMapping("/web/productos/nuevo")
-    public String formProducto(Model model) {
-        Producto p = new Producto();
-        p.setActivo(true);
-        model.addAttribute("producto", p);
-        return "nuevo_producto";
-    }
-
-    @GetMapping("/web/productos/editar/{id}")
-    public String editarProducto(@PathVariable Integer id, Model model) {
-        model.addAttribute("producto", productoService.obtenerPorId(id).orElse(null));
-        return "nuevo_producto";
-    }
-
-    @GetMapping("/web/productos/eliminar/{id}")
-    public String eliminarProducto(@PathVariable Integer id, RedirectAttributes ra) {
-        try {
-            productoService.eliminarProducto(id);
-            ra.addFlashAttribute("mensaje", "Producto eliminado.");
-        } catch (Exception e) {
-            ra.addFlashAttribute("error", "No se puede eliminar el producto (tiene historial).");
-        }
-        return "redirect:/web/productos";
-    }
-
-    @PostMapping("/web/productos/guardar")
-    public String guardarProducto(@ModelAttribute("producto") Producto producto, RedirectAttributes ra) {
-        productoService.guardarProducto(producto);
-        ra.addFlashAttribute("mensaje", "Producto guardado.");
-        return "redirect:/web/productos";
-    }
-
-    // ================= SEDES =================
     @GetMapping("/web/sedes")
     public String listarSedes(@RequestParam(required = false) String ciudad,
-                              @RequestParam(required = false) String nombre,
-                              Model model) {
-        List<Sede> lista;
-        if (ciudad == null && nombre == null) {
-            lista = sedeService.obtenerTodas();
-        } else {
-            lista = sedeRepository.buscarPorCiudadYNombre(ciudad, nombre);
-        }
-        model.addAttribute("listaSedes", lista);
+                              @RequestParam(required = false) String nombre, Model model) {
+        ciudad = clean(ciudad); nombre = clean(nombre);
+        model.addAttribute("listaSedes", (ciudad == null && nombre == null) ?
+                sedeService.obtenerTodas() : sedeRepository.buscarPorCiudadYNombre(ciudad, nombre));
         return "sedes";
     }
 
-    @GetMapping("/web/sedes/nuevo")
-    public String formSede(Model model) {
-        model.addAttribute("sede", new Sede());
-        return "nueva_sede";
-    }
-
-    @GetMapping("/web/sedes/editar/{id}")
-    public String editarSede(@PathVariable Integer id, Model model) {
-        model.addAttribute("sede", sedeService.obtenerPorId(id).orElse(null));
-        return "nueva_sede";
-    }
-
-    @GetMapping("/web/sedes/eliminar/{id}")
-    public String eliminarSede(@PathVariable Integer id, RedirectAttributes ra) {
-        try {
-            sedeService.eliminarSede(id);
-            ra.addFlashAttribute("mensaje", "Sede eliminada.");
-        } catch (Exception e) {
-            ra.addFlashAttribute("error", "No se puede eliminar la sede (tiene historial).");
-        }
-        return "redirect:/web/sedes";
-    }
-
-    @PostMapping("/web/sedes/guardar")
-    public String guardarSede(@ModelAttribute("sede") Sede sede, RedirectAttributes ra) {
-        sedeService.guardarSede(sede);
-        ra.addFlashAttribute("mensaje", "Sede guardada.");
-        return "redirect:/web/sedes";
-    }
-
-    // ================= PROVEEDORES =================
     @GetMapping("/web/proveedores")
     public String listarProveedores(@RequestParam(required = false) String nombre,
-                                    @RequestParam(required = false) String contacto,
-                                    Model model) {
-        List<Proveedor> lista;
-        if (nombre == null && contacto == null) {
-            lista = proveedorRepository.findAll();
-        } else {
-            lista = proveedorRepository.buscarAvanzado(nombre, contacto);
-        }
-        model.addAttribute("listaProveedores", lista);
+                                    @RequestParam(required = false) String contacto, Model model) {
+        nombre = clean(nombre); contacto = clean(contacto);
+        model.addAttribute("listaProveedores", (nombre == null && contacto == null) ?
+                proveedorRepository.findAll() : proveedorRepository.buscarAvanzado(nombre, contacto));
         return "proveedores";
     }
 
-    @GetMapping("/web/proveedores/nuevo")
-    public String formProveedor(Model model) {
-        model.addAttribute("proveedor", new Proveedor());
-        return "nuevo_proveedor";
-    }
-
-    @GetMapping("/web/proveedores/editar/{id}")
-    public String editarProveedor(@PathVariable Integer id, Model model) {
-        model.addAttribute("proveedor", proveedorRepository.findById(id).orElse(null));
-        return "nuevo_proveedor";
-    }
-
-    @GetMapping("/web/proveedores/eliminar/{id}")
-    public String eliminarProveedor(@PathVariable Integer id, RedirectAttributes ra) {
-        try {
-            proveedorRepository.deleteById(id);
-            ra.addFlashAttribute("mensaje", "Proveedor eliminado.");
-        } catch (Exception e) {
-            ra.addFlashAttribute("error", "No se puede eliminar el proveedor (tiene compras asociadas).");
-        }
-        return "redirect:/web/proveedores";
-    }
-
-    @PostMapping("/web/proveedores/guardar")
-    public String guardarProveedor(@ModelAttribute("proveedor") Proveedor proveedor, RedirectAttributes ra) {
-        proveedorRepository.save(proveedor);
-        ra.addFlashAttribute("mensaje", "Proveedor guardado.");
-        return "redirect:/web/proveedores";
-    }
-
-    // ================= PROMOCIONES =================
     @GetMapping("/web/promociones")
     public String listarPromociones(@RequestParam(required = false) String codigo,
-                                    @RequestParam(required = false) String tipo,
-                                    Model model) {
-        List<Promocion> lista = (codigo == null && tipo == null) ?
-                promocionService.obtenerTodas() : promocionRepository.filtrar(codigo, tipo);
-        model.addAttribute("listaPromociones", lista);
+                                    @RequestParam(required = false) String tipo, Model model) {
+        codigo = clean(codigo); tipo = clean(tipo);
+        model.addAttribute("listaPromociones", (codigo == null && tipo == null) ?
+                promocionService.obtenerTodas() : promocionRepository.filtrar(codigo, tipo));
         return "promociones";
-    }
-
-    @GetMapping("/web/promociones/nuevo")
-    public String formPromocion(Model model) {
-        model.addAttribute("promocion", new Promocion());
-        return "nueva_promocion";
-    }
-
-    @GetMapping("/web/promociones/editar/{id}")
-    public String editarPromocion(@PathVariable Integer id, Model model) {
-        model.addAttribute("promocion", promocionService.obtenerPorId(id).orElse(null));
-        return "nueva_promocion";
-    }
-
-    @GetMapping("/web/promociones/eliminar/{id}")
-    public String eliminarPromocion(@PathVariable Integer id, RedirectAttributes ra) {
-        promocionService.eliminar(id);
-        ra.addFlashAttribute("mensaje", "Promoción eliminada.");
-        return "redirect:/web/promociones";
-    }
-
-    @PostMapping("/web/promociones/guardar")
-    public String guardarPromocion(@ModelAttribute("promocion") Promocion promocion, RedirectAttributes ra) {
-        promocionService.guardar(promocion);
-        ra.addFlashAttribute("mensaje", "Promoción guardada.");
-        return "redirect:/web/promociones";
-    }
-
-    // ================= OPERACIONES (POS, COMPRAS, INVENTARIO) =================
-    @GetMapping("/web/pos")
-    public String pantallaPos(Model model) {
-        model.addAttribute("listaProductos", productoService.obtenerTodos());
-        model.addAttribute("listaClientes", clienteService.obtenerTodos());
-        model.addAttribute("listaSedes", sedeService.obtenerTodas());
-        model.addAttribute("listaPromociones", promocionService.obtenerTodas());
-        return "pos";
-    }
-
-    @GetMapping("/web/compras/nueva")
-    public String formNuevaCompra(Model model) {
-        model.addAttribute("listaProveedores", proveedorRepository.findAll());
-        model.addAttribute("listaSedes", sedeService.obtenerTodas());
-        model.addAttribute("listaProductos", productoService.obtenerTodos());
-        return "nueva_compra";
     }
 
     @GetMapping("/web/inventario")
     public String listarInventario(@RequestParam(required = false) Integer sedeId,
-                                   @RequestParam(required = false) String producto,
-                                   Model model) {
-        List<Inventario> lista = (sedeId == null && producto == null) ?
-                inventarioRepository.findAll() : inventarioRepository.filtrarInventario(sedeId, producto);
-        model.addAttribute("listaInventario", lista);
+                                   @RequestParam(required = false) String producto, Model model) {
+        producto = clean(producto);
+        model.addAttribute("listaInventario", (sedeId == null && producto == null) ?
+                inventarioRepository.findAll() : inventarioRepository.filtrarInventario(sedeId, producto));
         model.addAttribute("sedes", sedeService.obtenerTodas());
         return "inventario";
     }
 
-    @GetMapping("/web/inventario/editar/{id}")
-    public String editarInventario(@PathVariable Integer id, Model model) {
-        Inventario inv = inventarioRepository.findById(id).orElse(null);
-        model.addAttribute("inventario", inv);
-        return "editar_inventario";
-    }
+    // --- HISTORIALES CON FILTROS ---
 
-    @PostMapping("/web/inventario/guardar")
-    public String guardarInventario(@ModelAttribute("inventario") Inventario inventario, RedirectAttributes ra) {
-        Inventario existente = inventarioRepository.findById(inventario.getInventarioId()).orElse(null);
-        if(existente != null) {
-            existente.setCantidad(inventario.getCantidad());
-            existente.setUnidad(inventario.getUnidad());
-            inventarioRepository.save(existente);
-            ra.addFlashAttribute("mensaje", "Inventario actualizado manualmente.");
-        }
-        return "redirect:/web/inventario";
-    }
-
-    @GetMapping("/web/inventario/eliminar/{id}")
-    public String eliminarInventario(@PathVariable Integer id, RedirectAttributes ra) {
-        try {
-            inventarioRepository.deleteById(id);
-            ra.addFlashAttribute("mensaje", "Registro de inventario eliminado.");
-        } catch (Exception e) {
-            ra.addFlashAttribute("error", "No se puede eliminar.");
-        }
-        return "redirect:/web/inventario";
-    }
-
-    // ================= HISTORIALES =================
     @GetMapping("/web/historial/ventas")
     public String historialVentas(@RequestParam(required = false) LocalDate inicio,
                                   @RequestParam(required = false) LocalDate fin,
-                                  @RequestParam(required = false) String estado,
-                                  Model model) {
+                                  @RequestParam(required = false) String estado, Model model) {
+        estado = clean(estado);
         List<Factura> lista;
         if (inicio == null && fin == null && estado == null) {
             lista = facturaRepository.findAll();
@@ -417,22 +158,10 @@ public class WebController {
         return "historial_ventas";
     }
 
-    @GetMapping("/web/historial/ventas/eliminar/{id}")
-    public String eliminarFactura(@PathVariable Integer id, RedirectAttributes ra) {
-        try {
-            facturaRepository.deleteById(id);
-            ra.addFlashAttribute("mensaje", "Factura eliminada.");
-        } catch (Exception e) {
-            ra.addFlashAttribute("error", "No se puede eliminar la factura.");
-        }
-        return "redirect:/web/historial/ventas";
-    }
-
     @GetMapping("/web/historial/compras")
     public String historialCompras(@RequestParam(required = false) LocalDate inicio,
                                    @RequestParam(required = false) LocalDate fin,
-                                   @RequestParam(required = false) Integer proveedorId,
-                                   Model model) {
+                                   @RequestParam(required = false) Integer proveedorId, Model model) {
         List<Compra> lista;
         if (inicio == null && fin == null && proveedorId == null) {
             lista = compraRepository.findAll();
@@ -444,22 +173,11 @@ public class WebController {
         return "historial_compras";
     }
 
-    @GetMapping("/web/historial/compras/eliminar/{id}")
-    public String eliminarCompra(@PathVariable Integer id, RedirectAttributes ra) {
-        try {
-            compraRepository.deleteById(id);
-            ra.addFlashAttribute("mensaje", "Compra eliminada.");
-        } catch (Exception e) {
-            ra.addFlashAttribute("error", "No se puede eliminar la compra.");
-        }
-        return "redirect:/web/historial/compras";
-    }
-
     @GetMapping("/web/historial/pagos")
     public String historialPagos(@RequestParam(required = false) LocalDate inicio,
                                  @RequestParam(required = false) LocalDate fin,
-                                 @RequestParam(required = false) String metodo,
-                                 Model model) {
+                                 @RequestParam(required = false) String metodo, Model model) {
+        metodo = clean(metodo);
         List<Pago> lista;
         if (inicio == null && fin == null && metodo == null) {
             lista = pagoRepository.findAll();
@@ -470,14 +188,50 @@ public class WebController {
         return "historial_pagos";
     }
 
-    @GetMapping("/web/historial/pagos/eliminar/{id}")
-    public String eliminarPago(@PathVariable Integer id, RedirectAttributes ra) {
-        try {
-            pagoRepository.deleteById(id);
-            ra.addFlashAttribute("mensaje", "Pago eliminado.");
-        } catch (Exception e) {
-            ra.addFlashAttribute("error", "No se puede eliminar el pago.");
-        }
-        return "redirect:/web/historial/pagos";
-    }
+    // ... (MANTENER TODOS LOS MÉTODOS DE GUARDAR/ELIMINAR/EDITAR IGUAL QUE ANTES) ...
+    // ... (Asegúrate de incluir los métodos formUsuario, guardarUsuario, eliminarUsuario, etc.) ...
+    // ... (Por brevedad no los repito, pero NO LOS BORRES, solo reemplaza los métodos de listado con los de arriba) ...
+
+    // ... (Aquí abajo van los métodos de create/save/delete que ya tenías) ...
+    // --- PEGAR AQUÍ EL RESTO DEL CONTROLADOR QUE YA FUNCIONABA ---
+    @GetMapping("/web/usuarios/nuevo") public String formUsuario(Model m) { m.addAttribute("usuario", new Usuario()); return "nuevo_usuario"; }
+    @PostMapping("/web/usuarios/guardar") public String guardarUsuario(@ModelAttribute Usuario u, RedirectAttributes ra) { usuarioService.guardar(u); ra.addFlashAttribute("mensaje", "Usuario guardado."); return "redirect:/web/usuarios"; }
+    @GetMapping("/web/usuarios/eliminar/{id}") public String eliminarUsuario(@PathVariable Integer id, RedirectAttributes ra) { try { usuarioService.eliminar(id); ra.addFlashAttribute("mensaje", "Usuario eliminado."); } catch (Exception e) { ra.addFlashAttribute("error", "No se puede eliminar usuario con historial."); } return "redirect:/web/usuarios"; }
+    @GetMapping("/web/usuarios/editar/{id}") public String editarUsuario(@PathVariable Integer id, Model m) { m.addAttribute("usuario", usuarioService.obtenerPorId(id).orElse(null)); return "nuevo_usuario"; }
+
+    @GetMapping("/web/clientes/nuevo") public String formCliente(Model m) { m.addAttribute("cliente", new Cliente()); return "nuevo_cliente"; }
+    @PostMapping("/web/clientes/guardar") public String guardarCliente(@ModelAttribute Cliente c, RedirectAttributes ra) { clienteService.guardarCliente(c); ra.addFlashAttribute("mensaje", "Cliente guardado."); return "redirect:/web/clientes"; }
+    @GetMapping("/web/clientes/eliminar/{id}") public String eliminarCliente(@PathVariable Integer id, RedirectAttributes ra) { try { clienteService.eliminarCliente(id); ra.addFlashAttribute("mensaje", "Cliente eliminado."); } catch (Exception e) { ra.addFlashAttribute("error", "No se puede eliminar cliente con facturas."); } return "redirect:/web/clientes"; }
+    @GetMapping("/web/clientes/editar/{id}") public String editarCliente(@PathVariable Integer id, Model m) { m.addAttribute("cliente", clienteService.obtenerPorId(id).orElse(null)); return "nuevo_cliente"; }
+
+    @GetMapping("/web/productos/nuevo") public String formProducto(Model m) { Producto p = new Producto(); p.setActivo(true); m.addAttribute("producto", p); return "nuevo_producto"; }
+    @PostMapping("/web/productos/guardar") public String guardarProducto(@ModelAttribute Producto p, RedirectAttributes ra) { productoService.guardarProducto(p); ra.addFlashAttribute("mensaje", "Producto guardado."); return "redirect:/web/productos"; }
+    @GetMapping("/web/productos/eliminar/{id}") public String eliminarProducto(@PathVariable Integer id, RedirectAttributes ra) { try { productoService.eliminarProducto(id); ra.addFlashAttribute("mensaje", "Producto eliminado."); } catch (Exception e) { ra.addFlashAttribute("error", "No se puede eliminar producto con ventas."); } return "redirect:/web/productos"; }
+    @GetMapping("/web/productos/editar/{id}") public String editarProducto(@PathVariable Integer id, Model m) { m.addAttribute("producto", productoService.obtenerPorId(id).orElse(null)); return "nuevo_producto"; }
+
+    @GetMapping("/web/sedes/nuevo") public String formSede(Model m) { m.addAttribute("sede", new Sede()); return "nueva_sede"; }
+    @PostMapping("/web/sedes/guardar") public String guardarSede(@ModelAttribute Sede s, RedirectAttributes ra) { sedeService.guardarSede(s); ra.addFlashAttribute("mensaje", "Sede guardada."); return "redirect:/web/sedes"; }
+    @GetMapping("/web/sedes/eliminar/{id}") public String eliminarSede(@PathVariable Integer id, RedirectAttributes ra) { try { sedeService.eliminarSede(id); ra.addFlashAttribute("mensaje", "Sede eliminada."); } catch (Exception e) { ra.addFlashAttribute("error", "No se puede eliminar sede con historial."); } return "redirect:/web/sedes"; }
+    @GetMapping("/web/sedes/editar/{id}") public String editarSede(@PathVariable Integer id, Model m) { m.addAttribute("sede", sedeService.obtenerPorId(id).orElse(null)); return "nueva_sede"; }
+
+    @GetMapping("/web/proveedores/nuevo") public String formProv(Model m) { m.addAttribute("proveedor", new Proveedor()); return "nuevo_proveedor"; }
+    @PostMapping("/web/proveedores/guardar") public String guardarProv(@ModelAttribute Proveedor p, RedirectAttributes ra) { proveedorRepository.save(p); ra.addFlashAttribute("mensaje", "Proveedor guardado."); return "redirect:/web/proveedores"; }
+    @GetMapping("/web/proveedores/eliminar/{id}") public String eliminarProv(@PathVariable Integer id, RedirectAttributes ra) { try { proveedorRepository.deleteById(id); ra.addFlashAttribute("mensaje", "Proveedor eliminado."); } catch (Exception e) { ra.addFlashAttribute("error", "No se puede eliminar proveedor con compras."); } return "redirect:/web/proveedores"; }
+    @GetMapping("/web/proveedores/editar/{id}") public String editarProv(@PathVariable Integer id, Model m) { m.addAttribute("proveedor", proveedorRepository.findById(id).orElse(null)); return "nuevo_proveedor"; }
+
+    @GetMapping("/web/promociones/nuevo") public String formPromo(Model m) { m.addAttribute("promocion", new Promocion()); return "nueva_promocion"; }
+    @PostMapping("/web/promociones/guardar") public String guardarPromo(@ModelAttribute Promocion p, RedirectAttributes ra) { promocionService.guardar(p); ra.addFlashAttribute("mensaje", "Promoción guardada."); return "redirect:/web/promociones"; }
+    @GetMapping("/web/promociones/eliminar/{id}") public String eliminarPromo(@PathVariable Integer id, RedirectAttributes ra) { promocionService.eliminar(id); ra.addFlashAttribute("mensaje", "Promoción eliminada."); return "redirect:/web/promociones"; }
+    @GetMapping("/web/promociones/editar/{id}") public String editarPromo(@PathVariable Integer id, Model m) { m.addAttribute("promocion", promocionService.obtenerPorId(id).orElse(null)); return "nueva_promocion"; }
+
+    @GetMapping("/web/inventario/editar/{id}") public String edInv(@PathVariable Integer id, Model m) { m.addAttribute("inventario", inventarioRepository.findById(id).orElse(null)); return "editar_inventario"; }
+    @PostMapping("/web/inventario/guardar") public String guardInv(Inventario i, RedirectAttributes ra) { Inventario ex = inventarioRepository.findById(i.getInventarioId()).orElse(null); if(ex!=null){ ex.setCantidad(i.getCantidad()); ex.setUnidad(i.getUnidad()); inventarioRepository.save(ex); ra.addFlashAttribute("mensaje", "Stock actualizado"); } return "redirect:/web/inventario"; }
+    @GetMapping("/web/inventario/eliminar/{id}") public String delInv(@PathVariable Integer id, RedirectAttributes ra) { try{inventarioRepository.deleteById(id);}catch(Exception e){ra.addFlashAttribute("error","Error al eliminar");} return "redirect:/web/inventario"; }
+
+    @GetMapping("/web/pos") public String pantallaPos(Model m) { m.addAttribute("listaProductos", productoService.obtenerTodos()); m.addAttribute("listaClientes", clienteService.obtenerTodos()); m.addAttribute("listaSedes", sedeService.obtenerTodas()); m.addAttribute("listaPromociones", promocionService.obtenerTodas()); return "pos"; }
+    @GetMapping("/web/compras/nueva") public String formNuevaCompra(Model m) { m.addAttribute("listaProveedores", proveedorRepository.findAll()); m.addAttribute("listaSedes", sedeService.obtenerTodas()); m.addAttribute("listaProductos", productoService.obtenerTodos()); return "nueva_compra"; }
+
+    @GetMapping("/web/historial/ventas/eliminar/{id}") public String delFac(@PathVariable Integer id, RedirectAttributes ra) { try{facturaRepository.deleteById(id); ra.addFlashAttribute("mensaje","Factura eliminada");}catch(Exception e){ra.addFlashAttribute("error","No se puede eliminar factura");} return "redirect:/web/historial/ventas"; }
+    @GetMapping("/web/historial/compras/eliminar/{id}") public String delCom(@PathVariable Integer id, RedirectAttributes ra) { try{compraRepository.deleteById(id); ra.addFlashAttribute("mensaje","Compra eliminada");}catch(Exception e){ra.addFlashAttribute("error","No se puede eliminar compra");} return "redirect:/web/historial/compras"; }
+    @GetMapping("/web/historial/pagos/eliminar/{id}") public String delPag(@PathVariable Integer id, RedirectAttributes ra) { try{pagoRepository.deleteById(id); ra.addFlashAttribute("mensaje","Pago eliminado");}catch(Exception e){ra.addFlashAttribute("error","No se puede eliminar pago");} return "redirect:/web/historial/pagos"; }
 }

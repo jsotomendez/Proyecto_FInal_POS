@@ -1,4 +1,4 @@
- package com.unicordoba.FinalProject.repository;
+package com.unicordoba.FinalProject.repository;
 
 import com.unicordoba.FinalProject.entity.Promocion;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -9,7 +9,6 @@ import java.util.List;
 
 @Repository
 public interface PromocionRepository extends JpaRepository<Promocion, Integer> {
-
     @Query("SELECT p FROM Promocion p WHERE " +
             "(:codigo IS NULL OR LOWER(p.codigo) LIKE LOWER(CONCAT('%', :codigo, '%'))) AND " +
             "(:tipo IS NULL OR p.tipoDescuento = :tipo)")

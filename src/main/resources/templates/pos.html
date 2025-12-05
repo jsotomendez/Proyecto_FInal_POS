@@ -305,6 +305,58 @@
         function cerrarModalPago() {
             if(modalPagoBS) modalPagoBS.hide();
         }
+
+        function finalizarVenta() {
+            if (carrito.length === 0) { alert("⚠️ El carrito está vacío."); return; }
+
+            const pedidoDTO = {
+                // ... (tus datos del pedido) ...
+                clienteId: parseInt(document.getElementById("selectCliente").value),
+                sedeId: parseInt(document.getElementById("selectSede").value),
+                tipo: document.getElementById("selectTipo").value,
+                items: carrito
+            };
+
+            // Deshabilitar botón
+            const btn = document.querySelector("button[onclick='finalizarVenta()']");
+            const btnTextoOriginal = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Procesando...';
+
+            fetch('/api/pedidos', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(pedidoDTO)
+            })
+                .then(async response => {
+                    // Si la respuesta NO es OK (ej: error de stock 400), leemos el texto
+                    if (!response.ok) {
+                        const mensajeError = await response.text();
+                        throw new Error(mensajeError); // Lanzamos el error con el texto limpio
+                    }
+                    return response.json(); // Si es OK, seguimos normal
+                })
+                .then(data => {
+                    // ... (tu lógica de éxito) ...
+                    pedidoActualId = data.pedidoId;
+                    document.getElementById("pagoPedidoId").value = pedidoActualId;
+                    document.getElementById("pagoTotalDisplay").innerText = "$ " + data.total.toLocaleString();
+                    document.getElementById("pagoMonto").value = data.total;
+
+                    const modalElem = document.getElementById('modalPago');
+                    modalPagoBS = new bootstrap.Modal(modalElem);
+                    modalPagoBS.show();
+                })
+                .catch(e => {
+                    // AQUÍ SALDRÁ EL AVISO LIMPIO
+                    alert(e.message);
+                })
+                .finally(() => {
+                    btn.disabled = false;
+                    btn.innerHTML = btnTextoOriginal;
+                });
+        }
+
     </script>
 </div>
 
