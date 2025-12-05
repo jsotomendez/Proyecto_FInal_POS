@@ -13,11 +13,14 @@
     --danger-red: #c0392b;
 }
 
+/* --- CORRECCIÓN DE ESPACIO SUPERIOR --- */
 body {
     background-color: var(--bg-body) !important;
     color: var(--text-dark);
     font-family: 'Segoe UI', Roboto, Arial, sans-serif;
-    padding-top: 48px; /* Espacio para navbar */
+
+    /* AUMENTAMOS ESTO DE 48px A 80px */
+    padding-top: 80px;
 }
 
 /* ============================================================

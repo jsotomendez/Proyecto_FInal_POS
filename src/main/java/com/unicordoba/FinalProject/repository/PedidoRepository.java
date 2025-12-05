@@ -10,12 +10,16 @@ import java.util.List;
 
 @Repository
 public interface PedidoRepository extends JpaRepository<Pedido, Integer> {
-    @Query("SELECT COUNT(p) FROM Pedido p WHERE DATE(p.fechaHora) = CURRENT_DATE")
+
+    // CORREGIDO: Agregamos nativeQuery = true para que MySQL entienda DATE()
+    @Query(value = "SELECT COUNT(*) FROM pedido WHERE DATE(fecha_hora) = CURDATE()", nativeQuery = true)
     Long contarVentasHoy();
 
-    @Query("SELECT COALESCE(SUM(p.total), 0) FROM Pedido p WHERE DATE(p.fechaHora) = CURRENT_DATE AND p.estado = 'PAGADO'")
+    // CORREGIDO: nativeQuery = true
+    @Query(value = "SELECT COALESCE(SUM(total), 0) FROM pedido WHERE DATE(fecha_hora) = CURDATE() AND estado = 'PAGADO'", nativeQuery = true)
     BigDecimal sumarIngresosHoy();
 
+    // Este ya lo tenías bien, pero lo dejo aquí para completar
     @Query(value = "SELECT DATE(fecha_hora) as fecha, SUM(total) as total " +
             "FROM pedido WHERE estado = 'PAGADO' " +
             "GROUP BY DATE(fecha_hora) ORDER BY fecha DESC LIMIT 7", nativeQuery = true)
