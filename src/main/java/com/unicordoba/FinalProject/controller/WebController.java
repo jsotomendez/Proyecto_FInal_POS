@@ -446,12 +446,6 @@ public class WebController {
         return "redirect:/web/promociones";
     }
 
-    @GetMapping("/web/usuarios")
-    public String listarUsuarios(Model model) {
-        model.addAttribute("listaUsuarios", usuarioService.obtenerTodos());
-        return "usuarios"; // usuarios.html
-    }
-
     @GetMapping("/web/usuarios/nuevo")
     public String formUsuario(Model model) {
         Usuario u = new Usuario();

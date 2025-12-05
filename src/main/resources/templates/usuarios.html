@@ -6,12 +6,42 @@
     <link th:href="@{/css/styles.css}" rel="stylesheet">
 </head>
 <body class="bg-light container mt-5">
+<div class="container mt-3">
+    <div th:if="${mensaje}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle-fill"></i> <span th:text="${mensaje}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle-fill"></i> <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+</div>
+
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2>🔐 Gestión de Usuarios</h2>
     <div>
         <a href="/web/usuarios/nuevo" class="btn btn-primary">+ Nuevo Usuario</a>
         <a href="/" class="btn btn-outline-secondary">Inicio</a>
     </div>
+</div>
+
+<div class="card p-3 mb-3 bg-light shadow-sm">
+    <form action="/web/usuarios" method="GET" class="row g-2">
+        <div class="col-md-5">
+            <input type="text" name="username" class="form-control" placeholder="Buscar usuario...">
+        </div>
+        <div class="col-md-5">
+            <select name="rol" class="form-select">
+                <option value="">-- Todos los Roles --</option>
+                <option value="ADMIN">Administrador</option>
+                <option value="CAJERO">Cajero</option>
+                <option value="GERENTE">Gerente</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+        </div>
+    </form>
 </div>
 
 <table class="table table-bordered shadow bg-white">
@@ -26,6 +56,7 @@
     </tr>
     </thead>
     <tbody>
+
     <tr th:each="u : ${listaUsuarios}">
         <td th:text="${u.username}" class="fw-bold"></td>
         <td><span class="badge bg-secondary" th:text="${u.rol}"></span></td>

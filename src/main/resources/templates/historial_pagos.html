@@ -6,6 +6,16 @@
     <link th:href="@{/css/styles.css}" rel="stylesheet">
 </head>
 <body class="container mt-5">
+<div class="container mt-3">
+    <div th:if="${mensaje}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle-fill"></i> <span th:text="${mensaje}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle-fill"></i> <span th:text="${error}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+</div>
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h2>💸 Flujo de Caja (Pagos Recibidos)</h2>
@@ -47,6 +57,7 @@
             <th>Método</th>
             <th>Referencia</th>
             <th>Fecha</th>
+            <th>Acciones</th>
         </tr>
         </thead>
         <tbody>
@@ -63,6 +74,13 @@
             </td>
             <td th:text="${p.referenciaTransaccion}"></td>
             <td th:text="${#temporals.format(p.fechaHora, 'dd-MM-yyyy HH:mm')}"></td>
+            <td>
+                <a th:href="@{/web/historial/pagos/eliminar/{id}(id=${p.pagoId})}"
+                   class="btn btn-sm btn-danger"
+                   onclick="return confirm('¿Eliminar este pago?')">
+                    <i class="bi bi-trash"></i>
+                </a>
+            </td>
         </tr>
         <tr th:if="${listaPagos.empty}">
             <td colspan="6" class="text-center py-3 text-muted">
