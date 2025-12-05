@@ -1,175 +1,27 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org"
-      th:replace="~{fragments/base :: main-layout(title='Dashboard Gerencial', content=~{::#dashboard-content})}">
-
-<head><title>Ignorar</title></head>
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/base :: main-layout(title='Dashboard', content=~{::#dash-content})}">
 <body>
-
-<div id="dashboard-content">
-
-    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h1 class="h2">📊 Tablero de Control</h1>
-        <div class="btn-toolbar mb-2 mb-md-0">
-            <div class="btn-group me-2">
-                <button type="button" class="btn btn-sm btn-outline-secondary">Compartir</button>
-                <button type="button" class="btn btn-sm btn-outline-secondary">Exportar</button>
-            </div>
-        </div>
-    </div>
-
+<div id="dash-content">
+    <h2 class="mb-4">📊 Tablero de Control</h2>
     <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="card text-white bg-primary shadow h-100 border-0">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="card-subtitle mb-1 opacity-75">Ventas Hoy</h6>
-                            <h2 class="card-title display-6 fw-bold mb-0" th:text="${stats.totalVentasDia}">0</h2>
-                        </div>
-                        <i class="bi bi-cart-check fs-1 opacity-50"></i>
-                    </div>
-                    <small class="mt-2 d-block opacity-75">Pedidos procesados</small>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="card text-white bg-success shadow h-100 border-0">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="card-subtitle mb-1 opacity-75">Ingresos Hoy</h6>
-                            <h2 class="card-title display-6 fw-bold mb-0" th:text="${'$ ' + stats.ingresosDia}">$ 0</h2>
-                        </div>
-                        <i class="bi bi-currency-dollar fs-1 opacity-50"></i>
-                    </div>
-                    <small class="mt-2 d-block opacity-75">Facturación total</small>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="card text-white bg-danger shadow h-100 border-0">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="card-subtitle mb-1 opacity-75">Bajo Stock</h6>
-                            <h2 class="card-title display-6 fw-bold mb-0" th:text="${stats.productosBajoStock}">0</h2>
-                        </div>
-                        <i class="bi bi-exclamation-triangle fs-1 opacity-50"></i>
-                    </div>
-                    <small class="mt-2 d-block opacity-75">Productos críticos (< 10)</small>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-md-3">
-            <div class="card text-white bg-info shadow h-100 border-0">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="card-subtitle mb-1 opacity-75">Clientes</h6>
-                            <h2 class="card-title display-6 fw-bold mb-0" th:text="${stats.clientesRegistrados}">0</h2>
-                        </div>
-                        <i class="bi bi-people fs-1 opacity-50"></i>
-                    </div>
-                    <small class="mt-2 d-block opacity-75">Base de datos activa</small>
-                </div>
-            </div>
-        </div>
+        <div class="col-md-3"><div class="card text-white bg-primary h-100"><div class="card-body"><h5>Ventas Hoy</h5><h2 th:text="${stats.totalVentasDia}">0</h2></div></div></div>
+        <div class="col-md-3"><div class="card text-white bg-success h-100"><div class="card-body"><h5>Ingresos</h5><h2 th:text="${'$ ' + stats.ingresosDia}">0</h2></div></div></div>
+        <div class="col-md-3"><div class="card text-white bg-danger h-100"><div class="card-body"><h5>Bajo Stock</h5><h2 th:text="${stats.productosBajoStock}">0</h2></div></div></div>
+        <div class="col-md-3"><div class="card text-white bg-info h-100"><div class="card-body"><h5>Clientes</h5><h2 th:text="${stats.clientesRegistrados}">0</h2></div></div></div>
     </div>
-
     <div class="row">
-        <div class="col-lg-8 mb-4">
-            <div class="card shadow h-100">
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between bg-white border-bottom-0">
-                    <h6 class="m-0 font-weight-bold text-primary">Tendencia de Ventas (Últimos 7 días)</h6>
-                </div>
-                <div class="card-body">
-                    <canvas id="chartVentas" style="max-height: 350px;"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-lg-4 mb-4">
-            <div class="card shadow h-100">
-                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between bg-white border-bottom-0">
-                    <h6 class="m-0 font-weight-bold text-primary">Top 5 Productos</h6>
-                </div>
-                <div class="card-body d-flex justify-content-center align-items-center">
-                    <div style="width: 100%; max-width: 300px;">
-                        <canvas id="chartProductos"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <div class="col-md-8"><div class="card shadow"><div class="card-body"><canvas id="chartVentas"></canvas></div></div></div>
+        <div class="col-md-4"><div class="card shadow"><div class="card-body"><canvas id="chartProductos"></canvas></div></div></div>
     </div>
-
     <script th:inline="javascript">
-        /*<![CDATA[*/
-        // Datos inyectados desde el Controlador Java
-        var ventasDataRaw = /*[[${graficoVentas}]]*/ [];
-        var productosDataRaw = /*[[${graficoProductos}]]*/ [];
+        var fechas = /*[[${graficoVentas}]]*/ [].map(x=>x[0]).reverse();
+        var totales = /*[[${graficoVentas}]]*/ [].map(x=>x[1]).reverse();
+        new Chart(document.getElementById('chartVentas'), {type:'line', data:{labels:fechas, datasets:[{label:'Ingresos', data:totales, borderColor:'#e67e22', backgroundColor:'rgba(230,126,34,0.1)', fill:true}]}});
 
-        // Procesar datos Ventas
-        var fechas = ventasDataRaw.map(x => x[0]);
-        var totales = ventasDataRaw.map(x => x[1]);
-
-        // Procesar datos Productos
-        var prodNombres = productosDataRaw.map(x => x[0]);
-        var prodCantidades = productosDataRaw.map(x => x[1]);
-
-        // Gráfico de Línea (Ventas)
-        new Chart(document.getElementById('chartVentas'), {
-            type: 'line',
-            data: {
-                labels: fechas.reverse(), // Invertimos para que sea cronológico
-                datasets: [{
-                    label: 'Ingresos ($)',
-                    data: totales.reverse(),
-                    borderColor: '#e67e22', // Usamos el naranja de tu tema
-                    backgroundColor: 'rgba(230, 126, 34, 0.1)',
-                    borderWidth: 2,
-                    pointBackgroundColor: '#e67e22',
-                    fill: true,
-                    tension: 0.4 // Curvatura de la línea
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false }
-                },
-                scales: {
-                    y: { beginAtZero: true, grid: { borderDash: [2, 4] } },
-                    x: { grid: { display: false } }
-                }
-            }
-        });
-
-        // Gráfico de Dona (Productos)
-        new Chart(document.getElementById('chartProductos'), {
-            type: 'doughnut',
-            data: {
-                labels: prodNombres,
-                datasets: [{
-                    data: prodCantidades,
-                    // Colores de la paleta profesional
-                    backgroundColor: ['#2c3e50', '#e67e22', '#34495e', '#d35400', '#95a5a6'],
-                    borderWidth: 0
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'bottom', labels: { usePointStyle: true } }
-                }
-            }
-        });
-        /*]]>*/
+        var pNom = /*[[${graficoProductos}]]*/ [].map(x=>x[0]);
+        var pCant = /*[[${graficoProductos}]]*/ [].map(x=>x[1]);
+        new Chart(document.getElementById('chartProductos'), {type:'doughnut', data:{labels:pNom, datasets:[{data:pCant, backgroundColor:['#2c3e50','#e67e22','#34495e','#d35400','#95a5a6']}]}});
     </script>
-
-</div> </body>
+</div>
+</body>
 </html>

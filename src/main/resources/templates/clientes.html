@@ -32,18 +32,30 @@
     <div class="table-responsive shadow-sm">
         <table class="table table-bordered table-hover mb-0 bg-white">
             <thead class="table-dark">
-            <tr><th>ID</th><th>Nombre</th><th>Teléfono</th><th>Email</th><th>Dirección</th><th>Acciones</th></tr>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Teléfono</th>
+                <th>Email</th>
+                <th>Dirección</th>
+                <th>Acciones</th>
+            </tr>
             </thead>
             <tbody>
             <tr th:each="c : ${listaClientes}">
                 <td th:text="${c.clienteId}"></td>
-                <td th:text="${c.nombre}"></td>
+                <td th:text="${c.nombre}" class="fw-bold"></td>
                 <td th:text="${c.telefono}"></td>
                 <td th:text="${c.email}"></td>
                 <td th:text="${c.direccionDefault}"></td>
                 <td>
-                    <a th:href="@{/web/clientes/editar/{id}(id=${c.clienteId})}" class="btn btn-sm btn-warning text-white"><i class="bi bi-pencil-fill"></i></a>
-                    <a th:href="@{/web/clientes/eliminar/{id}(id=${c.clienteId})}" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar cliente?')"><i class="bi bi-trash-fill"></i></a>
+                    <a th:href="@{/web/clientes/editar/{id}(id=${c.clienteId})}" class="btn btn-sm btn-warning text-white">
+                        <i class="bi bi-pencil-fill"></i>
+                    </a>
+                    <a th:href="@{/web/clientes/eliminar/{id}(id=${c.clienteId})}" class="btn btn-sm btn-danger"
+                       onclick="return confirm('¿Eliminar cliente?')">
+                        <i class="bi bi-trash-fill"></i>
+                    </a>
                 </td>
             </tr>
             </tbody>

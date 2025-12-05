@@ -4,20 +4,20 @@
 ============================================================ */
 
 :root {
-    /* Definición de variables de color */
-    --main-brand: #2c3e50;       /* Azul oscuro profesional para barras y headers */
-    --main-brand-light: #34495e; /* Un tono un poco más claro */
-    --accent-color: #e67e22;     /* Naranja complementario para acciones principales */
-    --accent-hover: #d35400;     /* Naranja más oscuro para cuando pasas el mouse */
-    --bg-body: #f4f7f6;          /* Fondo gris claro limpio */
-    --text-dark: #2c3e50;        /* Color de texto principal */
-    --danger-red: #c0392b;       /* Un rojo más sobrio para eliminar */
+    --main-brand: #2c3e50;
+    --main-brand-light: #34495e;
+    --accent-color: #e67e22;
+    --accent-hover: #d35400;
+    --bg-body: #f4f7f6;
+    --text-dark: #2c3e50;
+    --danger-red: #c0392b;
 }
 
 body {
     background-color: var(--bg-body) !important;
     color: var(--text-dark);
-    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; /* Fuente más moderna */
+    font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+    padding-top: 48px; /* Espacio para navbar */
 }
 
 /* ============================================================
@@ -25,15 +25,9 @@ body {
    (Unificamos los colores del arcoíris en nuestra paleta)
 ============================================================ */
 
-/* 1. NAVBAR SUPERIOR */
-.navbar-dark.bg-dark, .bg-primary {
-    background-color: var(--main-brand) !important;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-}
-.navbar-brand {
-    font-weight: 700;
-    letter-spacing: 0.5px;
-}
+/* NAVBAR SUPERIOR */
+.navbar-dark.bg-dark { background-color: var(--main-brand) !important; }
+.navbar-brand { font-weight: 700; letter-spacing: 0.5px; padding: .75rem; background-color: rgba(0,0,0,.25); box-shadow: inset -1px 0 0 rgba(0,0,0,.25); }
 
 /* 2. ENCABEZADOS DE TARJETAS (CARD HEADERS)
    Hacemos que todos los headers (azules, verdes, amarillos) sean del color de la marca. */
@@ -180,79 +174,22 @@ div > a.btn-primary:hover, div > a.btn-warning:hover {
     box-shadow: 0 0 0 0.25rem rgba(230, 126, 34, 0.25);
 }
 
-/* ============================================================
-   NUEVO LAYOUT: SIDEBAR FIJO + CONTENIDO
-============================================================ */
+/* ... tus colores de la respuesta anterior ... */
 
-body {
-    font-size: .875rem;
-    /* Padding top para que el contenido no quede debajo de la navbar fija */
-    padding-top: 3.5rem;
-}
-
-/* --- Navbar Superior --- */
-.navbar-brand {
-    padding-top: .75rem;
-    padding-bottom: .75rem;
-    background-color: rgba(0, 0, 0, .25);
-    box-shadow: inset -1px 0 0 rgba(0, 0, 0, .25);
-}
-.navbar .nav-link {
-    padding-right: 1rem !important;
-    padding-left: 1rem !important;
-}
-
-/* --- Sidebar (Barra Lateral) --- */
+/* Sidebar Styles */
 .sidebar {
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    z-index: 100; /* Detrás del navbar superior */
-    padding: 48px 0 0; /* Altura del navbar */
-    box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
-    background-color: #fff !important; /* Fondo blanco para el sidebar */
+    position: fixed; top: 0; bottom: 0; left: 0; z-index: 100; padding: 48px 0 0;
+    box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1); background-color: #fff !important;
 }
+.sidebar-sticky { position: relative; top: 0; height: calc(100vh - 48px); padding-top: .5rem; overflow-x: hidden; overflow-y: auto; }
+.sidebar .nav-link { font-weight: 500; color: var(--main-brand); padding: 0.5rem 1rem; margin-right: 10px; border-radius: 0 25px 25px 0; }
+.sidebar .nav-link:hover { background-color: rgba(230, 126, 34, 0.1); color: var(--accent-color); }
+.sidebar .nav-link.active { color: var(--accent-color); background-color: rgba(230, 126, 34, 0.15); font-weight: 700; }
+.sidebar-heading { font-size: .75rem; text-transform: uppercase; letter-spacing: 1px; margin-top: 1rem; }
 
-.sidebar-sticky {
-    position: relative;
-    top: 0;
-    height: calc(100vh - 48px);
-    padding-top: .5rem;
-    overflow-x: hidden;
-    overflow-y: auto; /* Scroll si el menú es muy largo */
-}
-
-/* Enlaces del Sidebar */
-.sidebar .nav-link {
-    font-weight: 500;
-    color: var(--main-brand); /* Usamos tu color azul oscuro */
-    padding: 0.75rem 1rem;
-    border-radius: 0 25px 25px 0; /* Bordes redondeados a la derecha */
-    margin-right: 10px;
-    transition: all 0.3s;
-}
-
-.sidebar .nav-link:hover {
-    background-color: rgba(230, 126, 34, 0.1); /* Naranja muy suave al pasar mouse */
-    color: var(--accent-color);
-}
-
-.sidebar .nav-link.active {
-    color: var(--accent-color); /* Naranja vibrante para la opción activa */
-    background-color: rgba(230, 126, 34, 0.15);
-    font-weight: 700;
-}
-
-.sidebar-heading {
-    font-size: .75rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-top: 1.5rem;
-}
-
-/* Ajustes para la zona de contenido principal */
-main {
-    background-color: var(--bg-body);
-    min-height: 100vh;
-}
+/* COMPONENTES */
+.card { border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+.card-header { background-color: var(--main-brand) !important; color: white !important; font-weight: 600; }
+.card-header.bg-warning { background-color: #f39c12 !important; color: #fff !important; }
+.btn-primary { background-color: var(--accent-color) !important; border-color: var(--accent-color) !important; }
+.btn-primary:hover { background-color: var(--accent-hover) !important; }
