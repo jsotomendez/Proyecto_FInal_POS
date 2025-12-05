@@ -1,127 +1,27 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <title>Dashboard Gerencial</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link th:href="@{/css/styles.css}" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body class="bg-light">
-
-<nav class="navbar navbar-dark bg-dark mb-4">
-    <div class="container-fluid">
-        <span class="navbar-brand mb-0 h1">📊 Dashboard Ejecutivo</span>
-        <a href="/" class="btn btn-outline-light btn-sm">Volver al Menú</a>
-    </div>
-</nav>
-
-<div class="container">
+<html xmlns:th="http://www.thymeleaf.org" th:replace="~{fragments/base :: main-layout(title='Dashboard', content=~{::#dash-content})}">
+<body>
+<div id="dash-content">
+    <h2 class="mb-4">📊 Tablero de Control</h2>
     <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="card text-white bg-primary shadow h-100">
-                <div class="card-body">
-                    <h5 class="card-title">Ventas Hoy</h5>
-                    <h2 class="display-4 fw-bold" th:text="${stats.totalVentasDia}">0</h2>
-                    <small>Pedidos procesados</small>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-success shadow h-100">
-                <div class="card-body">
-                    <h5 class="card-title">Ingresos Hoy</h5>
-                    <h2 class="display-6 fw-bold" th:text="${'$ ' + stats.ingresosDia}">$ 0</h2>
-                    <small>Facturación total</small>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-danger shadow h-100">
-                <div class="card-body">
-                    <h5 class="card-title">Alertas Stock</h5>
-                    <h2 class="display-4 fw-bold" th:text="${stats.productosBajoStock}">0</h2>
-                    <small>Productos críticos</small>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-white bg-info shadow h-100">
-                <div class="card-body">
-                    <h5 class="card-title">Clientes</h5>
-                    <h2 class="display-4 fw-bold" th:text="${stats.clientesRegistrados}">0</h2>
-                    <small>Base de datos activa</small>
-                </div>
-            </div>
-        </div>
+        <div class="col-md-3"><div class="card text-white bg-primary h-100"><div class="card-body"><h5>Ventas Hoy</h5><h2 th:text="${stats.totalVentasDia}">0</h2></div></div></div>
+        <div class="col-md-3"><div class="card text-white bg-success h-100"><div class="card-body"><h5>Ingresos</h5><h2 th:text="${'$ ' + stats.ingresosDia}">0</h2></div></div></div>
+        <div class="col-md-3"><div class="card text-white bg-danger h-100"><div class="card-body"><h5>Bajo Stock</h5><h2 th:text="${stats.productosBajoStock}">0</h2></div></div></div>
+        <div class="col-md-3"><div class="card text-white bg-info h-100"><div class="card-body"><h5>Clientes</h5><h2 th:text="${stats.clientesRegistrados}">0</h2></div></div></div>
     </div>
-
     <div class="row">
-        <div class="col-md-8">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Tendencia de Ventas (Últimos 7 días)</h6>
-                </div>
-                <div class="card-body">
-                    <canvas id="chartVentas"></canvas>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Top 5 Productos</h6>
-                </div>
-                <div class="card-body">
-                    <canvas id="chartProductos"></canvas>
-                </div>
-            </div>
-        </div>
+        <div class="col-md-8"><div class="card shadow"><div class="card-body"><canvas id="chartVentas"></canvas></div></div></div>
+        <div class="col-md-4"><div class="card shadow"><div class="card-body"><canvas id="chartProductos"></canvas></div></div></div>
     </div>
+    <script th:inline="javascript">
+        var fechas = /*[[${graficoVentas}]]*/ [].map(x=>x[0]).reverse();
+        var totales = /*[[${graficoVentas}]]*/ [].map(x=>x[1]).reverse();
+        new Chart(document.getElementById('chartVentas'), {type:'line', data:{labels:fechas, datasets:[{label:'Ingresos', data:totales, borderColor:'#e67e22', backgroundColor:'rgba(230,126,34,0.1)', fill:true}]}});
+
+        var pNom = /*[[${graficoProductos}]]*/ [].map(x=>x[0]);
+        var pCant = /*[[${graficoProductos}]]*/ [].map(x=>x[1]);
+        new Chart(document.getElementById('chartProductos'), {type:'doughnut', data:{labels:pNom, datasets:[{data:pCant, backgroundColor:['#2c3e50','#e67e22','#34495e','#d35400','#95a5a6']}]}});
+    </script>
 </div>
-
-<script th:inline="javascript">
-    /*<![CDATA[*/
-    // Datos inyectados desde Java
-    var ventasDataRaw = /*[[${graficoVentas}]]*/ [];
-    var productosDataRaw = /*[[${graficoProductos}]]*/ [];
-
-    // Procesar datos Ventas
-    var fechas = ventasDataRaw.map(x => x[0]); // Fechas
-    var totales = ventasDataRaw.map(x => x[1]); // Dinero
-
-    // Procesar datos Productos
-    var prodNombres = productosDataRaw.map(x => x[0]);
-    var prodCantidades = productosDataRaw.map(x => x[1]);
-
-    // Gráfico de Barras (Ventas)
-    new Chart(document.getElementById('chartVentas'), {
-        type: 'line',
-        data: {
-            labels: fechas.reverse(),
-            datasets: [{
-                label: 'Ingresos ($)',
-                data: totales.reverse(),
-                borderColor: '#4e73df',
-                backgroundColor: 'rgba(78, 115, 223, 0.1)',
-                fill: true,
-                tension: 0.4
-            }]
-        }
-    });
-
-    // Gráfico de Dona (Productos)
-    new Chart(document.getElementById('chartProductos'), {
-        type: 'doughnut',
-        data: {
-            labels: prodNombres,
-            datasets: [{
-                data: prodCantidades,
-                backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b']
-            }]
-        }
-    });
-    /*]]>*/
-</script>
-
 </body>
 </html>
