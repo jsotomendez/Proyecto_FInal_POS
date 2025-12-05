@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/base :: main-layout(title='Nuevo Cliente', content=~{::#form-cliente-content})}">
+<head><title>Ignorar</title></head>
+<body>
+
+<div id="form-cliente-content">
+    <div class="card shadow col-md-8 mx-auto border-0">
+        <div class="card-header bg-primary text-white"><h4><i class="bi bi-person-plus-fill"></i> Registrar Cliente</h4></div>
+        <div class="card-body">
+            <form th:action="@{/web/clientes/guardar}" th:object="${cliente}" method="POST">
+
+                <input type="hidden" th:field="*{clienteId}" />
+
+                <div class="mb-3">
+                    <label class="form-label fw-bold">Nombre Completo</label>
+                    <input type="text" class="form-control" th:field="*{nombre}" required>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Teléfono</label>
+                        <input type="text" class="form-control" th:field="*{telefono}">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" th:field="*{email}">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Dirección</label>
+                    <input type="text" class="form-control" th:field="*{direccionDefault}">
+                </div>
+
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <a href="/web/clientes" class="btn btn-secondary me-md-2">Cancelar</a>
+                    <button type="submit" class="btn btn-success">Guardar Cliente</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/base :: main-layout(title='Promociones', content=~{::#promo-content})}">
+<head><title>Ignorar</title></head>
+<body>
+
+<div id="promo-content">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>🎟️ Gestión de Promociones</h2>
+        <div>
+            <a href="/web/promociones/nuevo" class="btn btn-primary">+ Nueva Promo</a>
+        </div>
+    </div>
+
+    <div class="card mb-3 bg-white p-3 shadow-sm border-0">
+        <form action="/web/promociones" method="GET" class="row g-2">
+            <div class="col-md-5">
+                <input type="text" name="codigo" class="form-control" placeholder="Código cupón...">
+            </div>
+            <div class="col-md-5">
+                <select name="tipo" class="form-select">
+                    <option value="">-- Todos los Tipos --</option>
+                    <option value="PORCENTAJE">Porcentaje</option>
+                    <option value="MONTO_FIJO">Monto Fijo</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-secondary w-100"><i class="bi bi-search"></i> Filtrar</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="table-responsive shadow-sm">
+        <table class="table table-bordered shadow-sm bg-white">
+            <thead class="table-dark">
+            <tr>
+                <th>Código</th>
+                <th>Descripción</th>
+                <th>Tipo</th>
+                <th>Valor</th>
+                <th>Vigencia</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="p : ${listaPromociones}">
+                <td th:text="${p.codigo}" class="fw-bold text-primary"></td>
+                <td th:text="${p.descripcion}"></td>
+                <td><span class="badge bg-info text-dark" th:text="${p.tipoDescuento}"></span></td>
+                <td th:text="${p.valor}" class="fw-bold"></td>
+                <td>
+                    <small th:text="${p.inicio} + ' al ' + ${p.fin}"></small>
+                </td>
+                <td>
+                    <a th:href="@{/web/promociones/editar/{id}(id=${p.promoId})}" class="btn btn-sm btn-warning text-white"><i class="bi bi-pencil-fill"></i></a>
+                    <a th:href="@{/web/promociones/eliminar/{id}(id=${p.promoId})}" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar?')"><i class="bi bi-trash-fill"></i></a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

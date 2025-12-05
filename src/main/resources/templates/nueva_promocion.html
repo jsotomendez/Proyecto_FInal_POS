@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/base :: main-layout(title='Nueva Promoción', content=~{::#form-promo-content})}">
+<head><title>Ignorar</title></head>
+<body>
+
+<div id="form-promo-content">
+    <div class="card shadow col-md-8 mx-auto border-0">
+        <div class="card-header bg-primary text-white"><h4>🎁 Registrar Promoción</h4></div>
+        <div class="card-body">
+            <form th:action="@{/web/promociones/guardar}" th:object="${promocion}" method="POST">
+                <input type="hidden" th:field="*{promoId}" />
+
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label>Código Cupón</label>
+                        <input type="text" class="form-control fw-bold" th:field="*{codigo}" placeholder="Ej: DESC10" required>
+                    </div>
+                    <div class="col-md-8">
+                        <label>Descripción</label>
+                        <input type="text" class="form-control" th:field="*{descripcion}" required>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label>Tipo Descuento</label>
+                        <select class="form-select" th:field="*{tipoDescuento}">
+                            <option value="PORCENTAJE">Porcentaje (%)</option>
+                            <option value="MONTO_FIJO">Monto Fijo ($)</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label>Valor</label>
+                        <input type="number" step="0.01" class="form-control" th:field="*{valor}" required>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label>Fecha Inicio</label>
+                        <input type="date" class="form-control" th:field="*{inicio}" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label>Fecha Fin</label>
+                        <input type="date" class="form-control" th:field="*{fin}" required>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label>Condiciones</label>
+                    <textarea class="form-control" th:field="*{condiciones}" rows="2"></textarea>
+                </div>
+
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <a href="/web/promociones" class="btn btn-secondary me-md-2">Cancelar</a>
+                    <button type="submit" class="btn btn-success">Guardar Promoción</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>

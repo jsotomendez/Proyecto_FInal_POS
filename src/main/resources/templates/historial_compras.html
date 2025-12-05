@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/base :: main-layout(title='Historial de Compras', content=~{::#historial-compras-content})}">
+<head><title>Ignorar</title></head>
+<body>
+
+<div id="historial-compras-content">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>📉 Historial de Compras (Gastos)</h2>
+    </div>
+
+    <div class="card p-3 mb-3 bg-white border-0 shadow-sm">
+        <form action="/web/historial/compras" method="GET" class="row g-2 align-items-end">
+            <div class="col-md-3">
+                <label class="form-label small fw-bold">Desde</label>
+                <input type="date" name="inicio" class="form-control">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small fw-bold">Hasta</label>
+                <input type="date" name="fin" class="form-control">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small fw-bold">Proveedor</label>
+                <select name="proveedorId" class="form-select">
+                    <option value="">-- Todos --</option>
+                    <option th:each="p : ${proveedores}"
+                            th:value="${p.proveedorId}"
+                            th:text="${p.nombre}"></option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-filter"></i> Filtrar Resultados
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="table-responsive shadow-sm">
+        <table class="table table-bordered table-hover mb-0 bg-white">
+            <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Fecha</th>
+                <th>Proveedor</th>
+                <th>Sede Destino</th>
+                <th>Total</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="c : ${listaCompras}">
+                <td th:text="${c.compraId}"></td>
+                <td th:text="${#temporals.format(c.fecha, 'dd-MM-yyyy HH:mm')}"></td>
+                <td th:text="${c.proveedor.nombre}"></td>
+                <td th:text="${c.sede.nombre}"></td>
+                <td th:text="${'$ ' + c.total}" class="fw-bold text-danger"></td>
+                <td>
+                    <span class="badge bg-success" th:text="${c.estado}"></span>
+                </td>
+                <td>
+                    <a th:href="@{/web/historial/compras/eliminar/{id}(id=${c.compraId})}"
+                       class="btn btn-sm btn-danger"
+                       onclick="return confirm('¿Eliminar este registro de compra?')">
+                        <i class="bi bi-trash-fill"></i>
+                    </a>
+                </td>
+            </tr>
+            <tr th:if="${listaCompras.empty}">
+                <td colspan="7" class="text-center py-3 text-muted">
+                    No se encontraron compras con estos filtros.
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>

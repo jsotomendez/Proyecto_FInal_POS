@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/base :: main-layout(title='Historial Pagos', content=~{::#pagos-content})}">
+<head><title>Ignorar</title></head>
+<body>
+
+<div id="pagos-content">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>💸 Flujo de Caja (Pagos)</h2>
+    </div>
+
+    <div class="card p-3 mb-3 bg-white border-0 shadow-sm">
+        <form action="/web/historial/pagos" method="GET" class="row g-2 align-items-end">
+            <div class="col-md-3"><label>Desde</label><input type="date" name="inicio" class="form-control"></div>
+            <div class="col-md-3"><label>Hasta</label><input type="date" name="fin" class="form-control"></div>
+            <div class="col-md-3">
+                <label>Método</label>
+                <select name="metodo" class="form-select">
+                    <option value="">-- Todos --</option>
+                    <option value="EFECTIVO">Efectivo</option>
+                    <option value="TARJETA">Tarjeta</option>
+                    <option value="NEQUI">Nequi</option>
+                </select>
+            </div>
+            <div class="col-md-3"><button type="submit" class="btn btn-primary w-100">Filtrar</button></div>
+        </form>
+    </div>
+
+    <div class="table-responsive shadow-sm">
+        <table class="table table-bordered table-hover bg-white">
+            <thead class="table-dark">
+            <tr><th>ID</th><th>Pedido</th><th>Monto</th><th>Método</th><th>Referencia</th><th>Fecha</th><th>Acciones</th></tr>
+            </thead>
+            <tbody>
+            <tr th:each="p : ${listaPagos}">
+                <td th:text="${p.pagoId}"></td>
+                <td><a th:href="@{'/web/pedidos/' + ${p.pedido.pedidoId}}" th:text="'#' + ${p.pedido.pedidoId}" class="text-decoration-none fw-bold"></a></td>
+                <td th:text="${'$ ' + p.monto}" class="fw-bold text-success"></td>
+                <td><span class="badge bg-secondary" th:text="${p.metodoPago}"></span></td>
+                <td th:text="${p.referenciaTransaccion}"></td>
+                <td th:text="${#temporals.format(p.fechaHora, 'dd-MM-yyyy HH:mm')}"></td>
+                <td>
+                    <a th:href="@{/web/historial/pagos/eliminar/{id}(id=${p.pagoId})}" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar pago?')">
+                        <i class="bi bi-trash-fill"></i>
+                    </a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

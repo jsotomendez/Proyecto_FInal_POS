@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/base :: main-layout(title='Inventario', content=~{::#inventario-content})}">
+<head><title>Ignorar</title></head>
+<body>
+
+<div id="inventario-content">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>📦 Stock Actual</h2>
+        <a href="/web/compras/nueva" class="btn btn-outline-success"><i class="bi bi-plus-circle"></i> Abastecer</a>
+    </div>
+
+    <div class="card p-3 mb-3 bg-white border-0 shadow-sm">
+        <form action="/web/inventario" method="GET" class="row g-2">
+            <div class="col-md-5">
+                <select name="sedeId" class="form-select">
+                    <option value="">-- Todas las Sedes --</option>
+                    <option th:each="s : ${sedes}" th:value="${s.sedeId}" th:text="${s.nombre}"></option>
+                </select>
+            </div>
+            <div class="col-md-5">
+                <input type="text" name="producto" class="form-control" placeholder="Nombre producto...">
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="table-responsive shadow-sm">
+        <table class="table table-striped border shadow-sm bg-white">
+            <thead class="table-dark">
+            <tr><th>Sede</th><th>Producto</th><th>Cantidad</th><th>Unidad</th><th>Último Mov.</th><th>Acciones</th></tr>
+            </thead>
+            <tbody>
+            <tr th:each="inv : ${listaInventario}">
+                <td th:text="${inv.sede.nombre}"></td>
+                <td th:text="${inv.producto.nombre}" class="fw-bold"></td>
+                <td th:classappend="${inv.cantidad < 10} ? 'text-danger fw-bold' : ''" th:text="${inv.cantidad}"></td>
+                <td th:text="${inv.unidad}"></td>
+                <td th:text="${#temporals.format(inv.fechaUltimoMovimiento, 'dd-MM HH:mm')}"></td>
+                <td>
+                    <a th:href="@{/web/inventario/editar/{id}(id=${inv.inventarioId})}" class="btn btn-sm btn-warning text-white"><i class="bi bi-pencil-fill"></i></a>
+                    <a th:href="@{/web/inventario/eliminar/{id}(id=${inv.inventarioId})}" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar registro?')"><i class="bi bi-trash-fill"></i></a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

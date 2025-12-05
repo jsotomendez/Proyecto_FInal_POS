@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/base :: main-layout(title='Historial Ventas', content=~{::#ventas-content})}">
+<head><title>Ignorar</title></head>
+<body>
+
+<div id="ventas-content">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>📈 Historial de Facturas</h2>
+    </div>
+
+    <div class="card p-3 mb-3 bg-white border-0 shadow-sm">
+        <form action="/web/historial/ventas" method="GET" class="row g-2 align-items-end">
+            <div class="col-md-3"><label>Desde</label><input type="date" name="inicio" class="form-control"></div>
+            <div class="col-md-3"><label>Hasta</label><input type="date" name="fin" class="form-control"></div>
+            <div class="col-md-3">
+                <label>Estado</label>
+                <select name="estado" class="form-select">
+                    <option value="">Todos</option>
+                    <option value="VIGENTE">Vigente</option>
+                    <option value="ANULADA">Anulada</option>
+                </select>
+            </div>
+            <div class="col-md-3"><button type="submit" class="btn btn-primary w-100">Filtrar</button></div>
+        </form>
+    </div>
+
+    <div class="table-responsive shadow-sm">
+        <table class="table table-bordered table-hover bg-white">
+            <thead class="table-dark"><tr><th>N° Factura</th><th>Fecha</th><th>Cliente</th><th>Total</th><th>Estado</th><th>Acciones</th></tr></thead>
+            <tbody>
+            <tr th:each="f : ${listaFacturas}">
+                <td th:text="${f.numeroFactura}"></td>
+                <td th:text="${#temporals.format(f.fechaEmision, 'dd-MM-yyyy HH:mm')}"></td>
+                <td th:text="${f.cliente.nombre}"></td>
+                <td th:text="${'$ ' + f.valorTotal}" class="fw-bold text-success"></td>
+                <td><span class="badge bg-success" th:text="${f.estado}"></span></td>
+                <td>
+                    <a th:href="@{/web/historial/ventas/eliminar/{id}(id=${f.facturaId})}"
+                       class="btn btn-sm btn-danger"
+                       onclick="return confirm('⚠️ ¿Eliminar esta factura?')">
+                        <i class="bi bi-trash-fill"></i>
+                    </a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

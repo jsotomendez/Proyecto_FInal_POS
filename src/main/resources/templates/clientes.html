@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/base :: main-layout(title='Gestión de Clientes', content=~{::#clientes-content})}">
+<head><title>Ignorar</title></head>
+<body>
+
+<div id="clientes-content">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>👥 Gestión de Clientes</h2>
+        <div>
+            <a href="/web/clientes/nuevo" class="btn btn-primary">+ Nuevo Cliente</a>
+        </div>
+    </div>
+
+    <div class="card mb-3 bg-white p-3 shadow-sm border-0">
+        <form action="/web/clientes" method="GET" class="row g-2">
+            <div class="col-md-4">
+                <input type="text" name="nombre" class="form-control" placeholder="Buscar por Nombre...">
+            </div>
+            <div class="col-md-3">
+                <input type="text" name="email" class="form-control" placeholder="Buscar por Email...">
+            </div>
+            <div class="col-md-3">
+                <input type="text" name="telefono" class="form-control" placeholder="Teléfono...">
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-secondary w-100"><i class="bi bi-search"></i> Filtrar</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="table-responsive shadow-sm">
+        <table class="table table-bordered table-hover mb-0 bg-white">
+            <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Teléfono</th>
+                <th>Email</th>
+                <th>Dirección</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="c : ${listaClientes}">
+                <td th:text="${c.clienteId}"></td>
+                <td th:text="${c.nombre}" class="fw-bold"></td>
+                <td th:text="${c.telefono}"></td>
+                <td th:text="${c.email}"></td>
+                <td th:text="${c.direccionDefault}"></td>
+                <td>
+                    <a th:href="@{/web/clientes/editar/{id}(id=${c.clienteId})}" class="btn btn-sm btn-warning text-white">
+                        <i class="bi bi-pencil-fill"></i>
+                    </a>
+                    <a th:href="@{/web/clientes/eliminar/{id}(id=${c.clienteId})}" class="btn btn-sm btn-danger"
+                       onclick="return confirm('¿Eliminar cliente?')">
+                        <i class="bi bi-trash-fill"></i>
+                    </a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>
