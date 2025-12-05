@@ -1,86 +1,76 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <title>Punto de Venta 2.0</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
-    <link th:href="@{/css/styles.css}" rel="stylesheet">
-    <style>
-        .product-list { max-height: 400px; overflow-y: auto; }
-        .total-display { background-color: #212529; color: #00ff00; font-family: 'Courier New', monospace; font-weight: bold; font-size: 2.5rem; text-align: right; padding: 10px; border-radius: 5px; }
-    </style>
-</head>
-<body class="bg-light">
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/base :: main-layout(title='Punto de Venta', content=~{::#pos-content})}">
+<head><title>Ignorar</title></head>
+<body>
 
-<div class="modal fade" id="modalPago" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header bg-success text-white"><h5 class="modal-title">💸 Finalizar Venta</h5></div>
-            <div class="modal-body">
-                <input type="hidden" id="pagoPedidoId">
-                <h3 class="text-center mb-4" id="pagoTotalDisplay"></h3>
-                <div class="mb-3">
-                    <label>Método de Pago</label>
-                    <select id="pagoMetodo" class="form-select">
-                        <option value="EFECTIVO">Efectivo</option>
-                        <option value="TARJETA">Tarjeta</option>
-                        <option value="NEQUI">Nequi / Daviplata</option>
-                    </select>
+<div id="pos-content">
+
+    <div class="modal fade" id="modalPago" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title"><i class="bi bi-cash-coin"></i> Finalizar Venta</h5>
+                    <button type="button" class="btn-close btn-close-white" onclick="cerrarModalPago()"></button>
                 </div>
-                <div class="mb-3">
-                    <label>Monto Recibido</label>
-                    <input type="number" id="pagoMonto" class="form-control form-control-lg">
+                <div class="modal-body">
+                    <input type="hidden" id="pagoPedidoId">
+                    <div class="text-center mb-4">
+                        <small class="text-muted">Total a Pagar</small>
+                        <h1 class="fw-bold text-success" id="pagoTotalDisplay">$ 0.00</h1>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Método de Pago</label>
+                        <select id="pagoMetodo" class="form-select form-select-lg">
+                            <option value="EFECTIVO">💵 Efectivo</option>
+                            <option value="TARJETA">💳 Tarjeta Débito/Crédito</option>
+                            <option value="NEQUI">📱 Nequi / Daviplata</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Monto Recibido</label>
+                        <input type="number" id="pagoMonto" class="form-control form-control-lg" placeholder="Ingrese valor">
+                    </div>
                 </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" onclick="cerrarModalPago()">Cancelar</button>
-                <button type="button" class="btn btn-success" onclick="procesarPago()">PAGAR</button>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="cerrarModalPago()">Cancelar</button>
+                    <button type="button" class="btn btn-success px-4" onclick="procesarPago()">Confirmar Pago</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-3">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="#"><i class="bi bi-cart4"></i> POS SYSTEM</a>
-        <div class="d-flex text-white align-items-center">
-            <span class="me-3" id="fechaHoy"></span>
-            <a href="/" class="btn btn-outline-light btn-sm">Salir</a>
-        </div>
-    </div>
-</nav>
-
-<div class="container-fluid">
-    <div class="row">
+    <div class="row h-100">
         <div class="col-md-4">
-            <div class="card shadow mb-3">
-                <div class="card-header bg-primary text-white"><i class="bi bi-person-lines-fill"></i> Datos de Venta</div>
+            <div class="card shadow-sm mb-3 border-0">
+                <div class="card-header bg-primary text-white"><i class="bi bi-person-lines-fill"></i> Datos del Pedido</div>
                 <div class="card-body">
                     <div class="row g-2">
                         <div class="col-md-6">
-                            <label class="small">Sede</label>
+                            <label class="small text-muted">Sede</label>
                             <select id="selectSede" class="form-select form-select-sm">
                                 <option th:each="s : ${listaSedes}" th:value="${s.sedeId}" th:text="${s.nombre}"></option>
                             </select>
                         </div>
                         <div class="col-md-6">
-                            <label class="small">Servicio</label>
+                            <label class="small text-muted">Servicio</label>
                             <select id="selectTipo" class="form-select form-select-sm">
                                 <option value="MESA">Mesa</option>
                                 <option value="DOMICILIO">Domicilio</option>
-                                <option value="LLEVAR">Llevar</option>
+                                <option value="LLEVAR">Para Llevar</option>
                             </select>
                         </div>
                         <div class="col-md-12">
-                            <label class="small">Cliente</label>
+                            <label class="small text-muted">Cliente</label>
                             <select id="selectCliente" class="form-select">
                                 <option th:each="c : ${listaClientes}" th:value="${c.clienteId}" th:text="${c.nombre}"></option>
                             </select>
                         </div>
                         <div class="col-md-12 mt-2">
-                            <label class="small text-danger fw-bold"><i class="bi bi-ticket-perforated"></i> Aplicar Promoción</label>
+                            <label class="small text-danger fw-bold"><i class="bi bi-ticket-perforated"></i> Promoción (Opcional)</label>
                             <select id="selectPromo" class="form-select border-danger">
-                                <option value="">-- Sin Promoción --</option>
+                                <option value="">-- Ninguna --</option>
                                 <option th:each="pro : ${listaPromociones}"
                                         th:value="${pro.promoId}"
                                         th:text="${pro.codigo + ' - ' + pro.descripcion}"></option>
@@ -90,11 +80,11 @@
                 </div>
             </div>
 
-            <div class="card shadow">
-                <div class="card-header bg-secondary text-white"><i class="bi bi-upc-scan"></i> Agregar Producto</div>
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-dark text-white"><i class="bi bi-upc-scan"></i> Agregar Producto</div>
                 <div class="card-body">
-                    <div class="input-group mb-3">
-                        <select id="selectProducto" class="form-select">
+                    <div class="mb-3">
+                        <select id="selectProducto" class="form-select form-select-lg">
                             <option value="">Buscar producto...</option>
                             <option th:each="p : ${listaProductos}"
                                     th:value="${p.productoId}"
@@ -108,7 +98,7 @@
                             <input type="number" id="inputCantidad" class="form-control" value="1" min="1" placeholder="Cant.">
                         </div>
                         <div class="col-6">
-                            <button onclick="agregarAlCarrito()" class="btn btn-success w-100"><i class="bi bi-plus-lg"></i> Agregar</button>
+                            <button onclick="agregarAlCarrito()" class="btn btn-primary w-100"><i class="bi bi-plus-lg"></i> Agregar</button>
                         </div>
                     </div>
                     <input type="text" id="inputNotas" class="form-control mt-2 form-control-sm" placeholder="Notas (ej: Sin salsa)">
@@ -117,9 +107,16 @@
         </div>
 
         <div class="col-md-8">
-            <div class="card shadow h-100">
+            <div class="card shadow-sm h-100 border-0">
+                <div class="card-header bg-white border-bottom pt-3 pb-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 text-primary fw-bold"><i class="bi bi-cart3"></i> Carrito de Compras</h5>
+                        <span class="badge bg-secondary" id="fechaHoy"></span>
+                    </div>
+                </div>
+
                 <div class="card-body d-flex flex-column p-0">
-                    <div class="table-responsive flex-grow-1 product-list p-3">
+                    <div class="table-responsive flex-grow-1 p-3" style="max-height: 450px; overflow-y: auto;">
                         <table class="table table-hover align-middle">
                             <thead class="table-light sticky-top">
                             <tr>
@@ -133,113 +130,235 @@
                             <tbody id="tablaCarritoBody">
                             </tbody>
                         </table>
+
+                        <div id="emptyCartMsg" class="text-center text-muted py-5">
+                            <i class="bi bi-basket display-1 opacity-25"></i>
+                            <p class="mt-3">El carrito está vacío</p>
+                        </div>
                     </div>
 
-                    <div class="p-3 bg-white border-top">
+                    <div class="p-4 bg-light border-top">
                         <div class="row align-items-center">
                             <div class="col-md-6">
-                                <small class="text-muted">Items: <span id="totalItems">0</span></small>
+                                <h6 class="text-muted">Items: <span id="totalItems" class="fw-bold text-dark">0</span></h6>
                             </div>
                             <div class="col-md-6">
-                                <div class="total-display" id="spanTotal">$ 0.00</div>
+                                <div class="bg-dark text-white p-3 rounded text-end shadow-sm">
+                                    <small class="d-block text-uppercase opacity-75" style="font-size: 0.7rem;">Total a Pagar</small>
+                                    <span id="spanTotal" class="display-6 fw-bold" style="font-family: 'Courier New', monospace;">$ 0.00</span>
+                                </div>
                             </div>
                         </div>
-                        <button onclick="finalizarVenta()" class="btn btn-primary w-100 btn-lg mt-3 fw-bold">
-                            COBRAR <i class="bi bi-currency-dollar"></i>
+                        <button onclick="finalizarVenta()" class="btn btn-success w-100 btn-lg mt-3 fw-bold shadow-sm">
+                            COBRAR VENTA <i class="bi bi-arrow-right-circle-fill ms-2"></i>
                         </button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <script>
+        let carrito = [];
+        let pedidoActualId = null;
+        // Instancia del modal de Bootstrap (se inicializa cuando se necesita)
+        let modalPagoBS = null;
+
+        document.getElementById("fechaHoy").innerText = new Date().toLocaleDateString();
+
+        function agregarAlCarrito() {
+            const selectProd = document.getElementById("selectProducto");
+            const cantidad = document.getElementById("inputCantidad").value;
+            const notas = document.getElementById("inputNotas").value;
+
+            if (selectProd.value === "" || cantidad <= 0) { alert("⚠️ Seleccione un producto y cantidad válida."); return; }
+
+            const id = selectProd.value;
+            const nombre = selectProd.options[selectProd.selectedIndex].getAttribute("data-nombre");
+            const precio = parseFloat(selectProd.options[selectProd.selectedIndex].getAttribute("data-precio"));
+
+            carrito.push({
+                productoId: parseInt(id),
+                nombre: nombre,
+                cantidad: parseInt(cantidad),
+                precio: precio,
+                subtotal: precio * cantidad,
+                observaciones: notas
+            });
+
+            renderizarTabla();
+
+            // Resetear campos
+            document.getElementById("inputCantidad").value = "1";
+            document.getElementById("inputNotas").value = "";
+            selectProd.focus();
+        }
+
+        function renderizarTabla() {
+            const tbody = document.getElementById("tablaCarritoBody");
+            const emptyMsg = document.getElementById("emptyCartMsg");
+
+            tbody.innerHTML = "";
+            let totalGeneral = 0;
+            let count = 0;
+
+            if(carrito.length > 0) {
+                emptyMsg.style.display = 'none';
+                carrito.forEach((item, index) => {
+                    totalGeneral += item.subtotal;
+                    count += item.cantidad;
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>
+                                <span class="fw-bold">${item.nombre}</span><br>
+                                <small class="text-muted fst-italic">${item.observaciones}</small>
+                            </td>
+                            <td class="text-center"><span class="badge bg-light text-dark border">${item.cantidad}</span></td>
+                            <td class="text-end">$${item.precio.toLocaleString()}</td>
+                            <td class="text-end fw-bold">$${item.subtotal.toLocaleString()}</td>
+                            <td class="text-end">
+                                <button onclick="eliminarItem(${index})" class="btn btn-outline-danger btn-sm border-0">
+                                    <i class="bi bi-trash-fill"></i>
+                                </button>
+                            </td>
+                        </tr>`;
+                });
+            } else {
+                emptyMsg.style.display = 'block';
+            }
+
+            document.getElementById("spanTotal").innerText = "$ " + totalGeneral.toLocaleString();
+            document.getElementById("totalItems").innerText = count;
+        }
+
+        function eliminarItem(index) {
+            carrito.splice(index, 1);
+            renderizarTabla();
+        }
+
+        function finalizarVenta() {
+            if (carrito.length === 0) { alert("⚠️ El carrito está vacío."); return; }
+
+            const pedidoDTO = {
+                clienteId: parseInt(document.getElementById("selectCliente").value),
+                sedeId: parseInt(document.getElementById("selectSede").value),
+                tipo: document.getElementById("selectTipo").value,
+                items: carrito
+            };
+
+            // Deshabilitar botón para evitar doble click
+            const btn = document.querySelector("button[onclick='finalizarVenta()']");
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Procesando...';
+
+            fetch('/api/pedidos', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(pedidoDTO)
+            })
+                .then(r => r.ok ? r.json() : r.text().then(t => {throw new Error(t)}))
+                .then(data => {
+                    pedidoActualId = data.pedidoId;
+                    // Prepara el modal
+                    document.getElementById("pagoPedidoId").value = pedidoActualId;
+                    document.getElementById("pagoTotalDisplay").innerText = "$ " + data.total.toLocaleString();
+                    document.getElementById("pagoMonto").value = data.total;
+
+                    // Muestra el modal
+                    const modalElem = document.getElementById('modalPago');
+                    modalPagoBS = new bootstrap.Modal(modalElem);
+                    modalPagoBS.show();
+                })
+                .catch(e => {
+                    alert("❌ Error al crear pedido: " + e.message);
+                })
+                .finally(() => {
+                    btn.disabled = false;
+                    btn.innerHTML = 'COBRAR VENTA <i class="bi bi-arrow-right-circle-fill ms-2"></i>';
+                });
+        }
+
+        function procesarPago() {
+            const pagoDTO = {
+                pedidoId: pedidoActualId,
+                monto: parseFloat(document.getElementById("pagoMonto").value),
+                metodoPago: document.getElementById("pagoMetodo").value
+            };
+
+            fetch('/api/pagos', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(pagoDTO)
+            })
+                .then(r => r.ok ? r.json() : r.text().then(t => {throw new Error(t)}))
+                .then(factura => {
+                    cerrarModalPago();
+                    alert("✅ ¡Pago Exitoso! Factura N°: " + factura.numeroFactura);
+                    carrito = [];
+                    renderizarTabla();
+                    // Opcional: Recargar para limpiar todo
+                    window.location.reload();
+                })
+                .catch(e => alert("❌ Error al procesar pago: " + e.message));
+        }
+
+        function cerrarModalPago() {
+            if(modalPagoBS) modalPagoBS.hide();
+        }
+
+        function finalizarVenta() {
+            if (carrito.length === 0) { alert("⚠️ El carrito está vacío."); return; }
+
+            const pedidoDTO = {
+                // ... (tus datos del pedido) ...
+                clienteId: parseInt(document.getElementById("selectCliente").value),
+                sedeId: parseInt(document.getElementById("selectSede").value),
+                tipo: document.getElementById("selectTipo").value,
+                items: carrito
+            };
+
+            // Deshabilitar botón
+            const btn = document.querySelector("button[onclick='finalizarVenta()']");
+            const btnTextoOriginal = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Procesando...';
+
+            fetch('/api/pedidos', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(pedidoDTO)
+            })
+                .then(async response => {
+                    // Si la respuesta NO es OK (ej: error de stock 400), leemos el texto
+                    if (!response.ok) {
+                        const mensajeError = await response.text();
+                        throw new Error(mensajeError); // Lanzamos el error con el texto limpio
+                    }
+                    return response.json(); // Si es OK, seguimos normal
+                })
+                .then(data => {
+                    // ... (tu lógica de éxito) ...
+                    pedidoActualId = data.pedidoId;
+                    document.getElementById("pagoPedidoId").value = pedidoActualId;
+                    document.getElementById("pagoTotalDisplay").innerText = "$ " + data.total.toLocaleString();
+                    document.getElementById("pagoMonto").value = data.total;
+
+                    const modalElem = document.getElementById('modalPago');
+                    modalPagoBS = new bootstrap.Modal(modalElem);
+                    modalPagoBS.show();
+                })
+                .catch(e => {
+                    // AQUÍ SALDRÁ EL AVISO LIMPIO
+                    alert(e.message);
+                })
+                .finally(() => {
+                    btn.disabled = false;
+                    btn.innerHTML = btnTextoOriginal;
+                });
+        }
+
+    </script>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    // ... (PEGA AQUÍ EL MISMO SCRIPT JAVASCRIPT QUE TE DI EN LA RESPUESTA ANTERIOR) ...
-    // ... (Solo asegúrate de que los IDs del HTML coincidan con los del JS) ...
-
-    // Aquí te repito la lógica esencial para que funcione directo:
-    let carrito = [];
-    let pedidoActualId = null;
-
-    function agregarAlCarrito() {
-        const selectProd = document.getElementById("selectProducto");
-        const cantidad = document.getElementById("inputCantidad").value;
-        const notas = document.getElementById("inputNotas").value;
-
-        if (selectProd.value === "" || cantidad <= 0) { alert("Revise datos"); return; }
-
-        const id = selectProd.value;
-        const nombre = selectProd.options[selectProd.selectedIndex].getAttribute("data-nombre");
-        const precio = parseFloat(selectProd.options[selectProd.selectedIndex].getAttribute("data-precio"));
-
-        carrito.push({ productoId: parseInt(id), nombre: nombre, cantidad: parseInt(cantidad), precio: precio, subtotal: precio * cantidad, observaciones: notas });
-        renderizarTabla();
-    }
-
-    function renderizarTabla() {
-        const tbody = document.getElementById("tablaCarritoBody");
-        tbody.innerHTML = "";
-        let totalGeneral = 0;
-        let count = 0;
-
-        carrito.forEach((item, index) => {
-            totalGeneral += item.subtotal;
-            count += item.cantidad;
-            tbody.innerHTML += `
-                <tr>
-                    <td>${item.nombre}<br><small class="text-muted">${item.observaciones}</small></td>
-                    <td class="text-center">${item.cantidad}</td>
-                    <td class="text-end">$${item.precio}</td>
-                    <td class="text-end fw-bold">$${item.subtotal}</td>
-                    <td class="text-end"><button onclick="eliminarItem(${index})" class="btn btn-outline-danger btn-sm"><i class="bi bi-trash"></i></button></td>
-                </tr>`;
-        });
-
-        document.getElementById("spanTotal").innerText = "$ " + totalGeneral.toLocaleString();
-        document.getElementById("totalItems").innerText = count;
-    }
-
-    function eliminarItem(index) { carrito.splice(index, 1); renderizarTabla(); }
-
-    function finalizarVenta() {
-        if (carrito.length === 0) return;
-
-        const pedidoDTO = {
-            clienteId: parseInt(document.getElementById("selectCliente").value),
-            sedeId: parseInt(document.getElementById("selectSede").value),
-            tipo: document.getElementById("selectTipo").value,
-            items: carrito
-            // Nota: Aquí podrías enviar el ID de la promo si modificaras el DTO en Java
-        };
-
-        fetch('/api/pedidos', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(pedidoDTO) })
-            .then(r => r.ok ? r.json() : r.text().then(t => {throw new Error(t)}))
-            .then(data => {
-                pedidoActualId = data.pedidoId;
-                document.getElementById("pagoPedidoId").value = pedidoActualId;
-                document.getElementById("pagoTotalDisplay").innerText = "$ " + data.total; // Mostrar en modal
-                document.getElementById("pagoMonto").value = data.total;
-                new bootstrap.Modal(document.getElementById('modalPago')).show();
-            })
-            .catch(e => alert("Error: " + e.message));
-    }
-
-    function procesarPago() {
-        const pagoDTO = {
-            pedidoId: pedidoActualId,
-            monto: parseFloat(document.getElementById("pagoMonto").value),
-            metodoPago: document.getElementById("pagoMetodo").value
-        };
-        fetch('/api/pagos', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(pagoDTO) })
-            .then(r => r.ok ? r.json() : r.text().then(t => {throw new Error(t)}))
-            .then(factura => { alert("✅ Pago exitoso!"); window.location.reload(); })
-            .catch(e => alert("Error pago: " + e.message));
-    }
-
-    function cerrarModalPago() { window.location.reload(); }
-    document.getElementById("fechaHoy").innerText = new Date().toLocaleDateString();
-</script>
 </body>
 </html>

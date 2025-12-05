@@ -6,21 +6,49 @@
         <h2>🔐 Usuarios</h2>
         <a href="/web/usuarios/nuevo" class="btn btn-primary">+ Nuevo</a>
     </div>
+
     <div class="card mb-3 p-3 bg-white shadow-sm">
         <form action="/web/usuarios" method="GET" class="row g-2">
-            <div class="col-md-5"><input type="text" name="username" class="form-control" placeholder="Username..."></div>
-            <div class="col-md-5"><select name="rol" class="form-select"><option value="">Todos</option><option value="ADMIN">Admin</option><option value="CAJERO">Cajero</option></select></div>
-            <div class="col-md-2"><button class="btn btn-secondary w-100">Filtrar</button></div>
+            <div class="col-md-5">
+                <input type="text" name="username" class="form-control" placeholder="Username...">
+            </div>
+            <div class="col-md-5">
+                <select name="rol" class="form-select">
+                    <option value="">-- Todos los Roles --</option>
+                    <option value="ADMIN">Administrador</option>
+                    <option value="CAJERO">Cajero</option>
+                    <option value="GERENTE">Gerente</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button class="btn btn-secondary w-100">Filtrar</button>
+            </div>
         </form>
     </div>
+
     <table class="table table-hover bg-white shadow-sm">
-        <thead class="table-dark"><tr><th>User</th><th>Rol</th><th>Email</th><th>Estado</th><th>Acciones</th></tr></thead>
+        <thead class="table-dark">
+        <tr>
+            <th>User</th>
+            <th>Rol</th>
+            <th>Email</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+        </thead>
         <tbody>
         <tr th:each="u : ${listaUsuarios}">
             <td th:text="${u.username}"></td>
-            <td th:text="${u.rol}"></td>
+            <td>
+                    <span th:class="${'badge ' + (u.rol == 'ADMIN' ? 'bg-danger' : (u.rol == 'GERENTE' ? 'bg-warning text-dark' : 'bg-info text-dark'))}"
+                          th:text="${u.rol}"></span>
+            </td>
             <td th:text="${u.email}"></td>
-            <td><span th:text="${u.activo ? 'Activo' : 'Inactivo'}" class="badge" th:classappend="${u.activo ? 'bg-success' : 'bg-danger'}"></span></td>
+            <td>
+                    <span th:text="${u.activo ? 'Activo' : 'Inactivo'}"
+                          class="badge"
+                          th:classappend="${u.activo ? 'bg-success' : 'bg-secondary'}"></span>
+            </td>
             <td>
                 <a th:href="@{/web/usuarios/editar/{id}(id=${u.usuarioId})}" class="btn btn-sm btn-warning text-white"><i class="bi bi-pencil-fill"></i></a>
                 <a th:href="@{/web/usuarios/eliminar/{id}(id=${u.usuarioId})}" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar?')"><i class="bi bi-trash-fill"></i></a>

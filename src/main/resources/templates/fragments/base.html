@@ -24,26 +24,39 @@
         <nav id="sidebarMenu" class="col-md-3 col-lg-2 d-md-block bg-white sidebar collapse">
             <div class="position-sticky pt-3 sidebar-sticky">
                 <ul class="nav flex-column">
-                    <li class="nav-item"><a class="nav-link" th:classappend="${#httpServletRequest.requestURI == '/web/dashboard' ? 'active' : ''}" href="/web/dashboard"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a></li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:classappend="${currentUri == '/web/dashboard' ? 'active' : ''}" href="/web/dashboard">
+                            <i class="bi bi-speedometer2 me-2"></i> Dashboard
+                        </a>
+                    </li>
+
                     <h6 class="sidebar-heading px-3 mt-3 text-muted text-uppercase">Operaciones</h6>
-                    <li class="nav-item"><a class="nav-link" th:classappend="${#httpServletRequest.requestURI == '/web/pos' ? 'active' : ''}" href="/web/pos"><i class="bi bi-cart4 me-2"></i> POS</a></li>
-                    <li class="nav-item"><a class="nav-link" th:classappend="${#httpServletRequest.requestURI.contains('/web/compras/nueva') ? 'active' : ''}" href="/web/compras/nueva"><i class="bi bi-bag-plus me-2"></i> Abastecer</a></li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:classappend="${currentUri == '/web/pos' ? 'active' : ''}" href="/web/pos">
+                            <i class="bi bi-cart4 me-2"></i> POS
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:classappend="${currentUri != null && currentUri.contains('/web/compras/nueva') ? 'active' : ''}" href="/web/compras/nueva">
+                            <i class="bi bi-bag-plus me-2"></i> Abastecer
+                        </a>
+                    </li>
 
                     <h6 class="sidebar-heading px-3 mt-3 text-muted text-uppercase">Gestión</h6>
-                    <li class="nav-item"><a class="nav-link" th:classappend="${#httpServletRequest.requestURI.contains('/web/productos') ? 'active' : ''}" href="/web/productos"><i class="bi bi-tags me-2"></i> Productos</a></li>
-                    <li class="nav-item"><a class="nav-link" th:classappend="${#httpServletRequest.requestURI.contains('/web/inventario') ? 'active' : ''}" href="/web/inventario"><i class="bi bi-boxes me-2"></i> Inventario</a></li>
-                    <li class="nav-item"><a class="nav-link" th:classappend="${#httpServletRequest.requestURI.contains('/web/clientes') ? 'active' : ''}" href="/web/clientes"><i class="bi bi-people me-2"></i> Clientes</a></li>
-                    <li class="nav-item"><a class="nav-link" th:classappend="${#httpServletRequest.requestURI.contains('/web/sedes') ? 'active' : ''}" href="/web/sedes"><i class="bi bi-building me-2"></i> Sedes</a></li>
-                    <li class="nav-item"><a class="nav-link" th:classappend="${#httpServletRequest.requestURI.contains('/web/proveedores') ? 'active' : ''}" href="/web/proveedores"><i class="bi bi-truck me-2"></i> Proveedores</a></li>
+                    <li class="nav-item"><a class="nav-link" th:classappend="${currentUri != null && currentUri.contains('/web/productos') ? 'active' : ''}" href="/web/productos"><i class="bi bi-tags me-2"></i> Productos</a></li>
+                    <li class="nav-item"><a class="nav-link" th:classappend="${currentUri != null && currentUri.contains('/web/inventario') ? 'active' : ''}" href="/web/inventario"><i class="bi bi-boxes me-2"></i> Inventario</a></li>
+                    <li class="nav-item"><a class="nav-link" th:classappend="${currentUri != null && currentUri.contains('/web/clientes') ? 'active' : ''}" href="/web/clientes"><i class="bi bi-people me-2"></i> Clientes</a></li>
+                    <li class="nav-item"><a class="nav-link" th:classappend="${currentUri != null && currentUri.contains('/web/sedes') ? 'active' : ''}" href="/web/sedes"><i class="bi bi-building me-2"></i> Sedes</a></li>
+                    <li class="nav-item"><a class="nav-link" th:classappend="${currentUri != null && currentUri.contains('/web/proveedores') ? 'active' : ''}" href="/web/proveedores"><i class="bi bi-truck me-2"></i> Proveedores</a></li>
 
                     <h6 class="sidebar-heading px-3 mt-3 text-muted text-uppercase">Historiales</h6>
-                    <li class="nav-item"><a class="nav-link" th:classappend="${#httpServletRequest.requestURI.contains('/web/historial/ventas') ? 'active' : ''}" href="/web/historial/ventas"><i class="bi bi-receipt me-2"></i> Ventas</a></li>
-                    <li class="nav-item"><a class="nav-link" th:classappend="${#httpServletRequest.requestURI.contains('/web/historial/compras') ? 'active' : ''}" href="/web/historial/compras"><i class="bi bi-bag-check me-2"></i> Compras</a></li>
-                    <li class="nav-item"><a class="nav-link" th:classappend="${#httpServletRequest.requestURI.contains('/web/historial/pagos') ? 'active' : ''}" href="/web/historial/pagos"><i class="bi bi-cash-stack me-2"></i> Pagos</a></li>
+                    <li class="nav-item"><a class="nav-link" th:classappend="${currentUri != null && currentUri.contains('/web/historial/ventas') ? 'active' : ''}" href="/web/historial/ventas"><i class="bi bi-receipt me-2"></i> Ventas</a></li>
+                    <li class="nav-item"><a class="nav-link" th:classappend="${currentUri != null && currentUri.contains('/web/historial/compras') ? 'active' : ''}" href="/web/historial/compras"><i class="bi bi-bag-check me-2"></i> Compras</a></li>
+                    <li class="nav-item"><a class="nav-link" th:classappend="${currentUri != null && currentUri.contains('/web/historial/pagos') ? 'active' : ''}" href="/web/historial/pagos"><i class="bi bi-cash-stack me-2"></i> Pagos</a></li>
 
                     <h6 class="sidebar-heading px-3 mt-3 text-muted text-uppercase">Seguridad</h6>
-                    <li class="nav-item"><a class="nav-link" th:classappend="${#httpServletRequest.requestURI.contains('/web/usuarios') ? 'active' : ''}" href="/web/usuarios"><i class="bi bi-person-badge me-2"></i> Usuarios</a></li>
-                    <li class="nav-item"><a class="nav-link" th:classappend="${#httpServletRequest.requestURI.contains('/web/promociones') ? 'active' : ''}" href="/web/promociones"><i class="bi bi-ticket-perforated me-2"></i> Promociones</a></li>
+                    <li class="nav-item"><a class="nav-link" th:classappend="${currentUri != null && currentUri.contains('/web/usuarios') ? 'active' : ''}" href="/web/usuarios"><i class="bi bi-person-badge me-2"></i> Usuarios</a></li>
+                    <li class="nav-item"><a class="nav-link" th:classappend="${currentUri != null && currentUri.contains('/web/promociones') ? 'active' : ''}" href="/web/promociones"><i class="bi bi-ticket-perforated me-2"></i> Promociones</a></li>
                 </ul>
             </div>
         </nav>
@@ -59,6 +72,19 @@
             </div>
 
             <div th:replace="${content}"></div>
+
+            <footer class="mt-5 py-3 border-top text-center text-muted bg-light rounded shadow-sm">
+                <div class="container">
+                    <p class="mb-1 fw-bold text-uppercase" style="letter-spacing: 1px;">Proyecto Final - Sistema POS</p>
+                    <div class="small">
+                        <span class="mx-2">José Soto Méndez</span> &bull;
+                        <span class="mx-2">Miguel Guerra Negrete</span> &bull;
+                        <span class="mx-2">Andrés Luna Moreno</span>
+                    </div>
+                    <p class="mb-0 mt-1 small">Ingeniería de Sistemas - Universidad de Córdoba 2025</p>
+                </div>
+            </footer>
+
         </main>
     </div>
 </div>

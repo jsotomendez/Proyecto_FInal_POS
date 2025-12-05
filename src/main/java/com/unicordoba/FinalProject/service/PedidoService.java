@@ -51,7 +51,9 @@ public class PedidoService {
             BigDecimal cantidadSolicitada = new BigDecimal(itemDto.getCantidad());
 
             if (inventario.getCantidad().compareTo(cantidadSolicitada) < 0) {
-                throw new RuntimeException("Stock insuficiente para: " + producto.getNombre() + ". Disponible: " + inventario.getCantidad());
+                throw new RuntimeException("⚠️ Stock insuficiente para: " + producto.getNombre() +
+                        ".\nSolicitado: " + cantidadSolicitada +
+                        "\nDisponible: " + inventario.getCantidad());
             }
 
             inventario.setCantidad(inventario.getCantidad().subtract(cantidadSolicitada));
