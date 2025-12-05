@@ -1,4 +1,4 @@
-# 🛒 Sistema POS Web - Gestión Integral para Restaurantes y Retail
+#  Sistema POS Web - Gestión Integral para Restaurantes y Retail
 
 ![Java](https://img.shields.io/badge/Java-21-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5.8-6DB33F?style=for-the-badge&logo=spring-boot&logoColor=white)
@@ -6,7 +6,7 @@
 ![Thymeleaf](https://img.shields.io/badge/Thymeleaf-Frontend-005F0F?style=for-the-badge&logo=thymeleaf&logoColor=white)
 ![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white)
 
-## 📄 Descripción del Proyecto
+##  Descripción del Proyecto
 
 Este proyecto es una **Plataforma de Punto de Venta (POS)** basada en la web, desarrollada como proyecto final para las asignaturas de **Base de Datos 2** y **Programación 3** de la carrera de Ingeniería de Sistemas en la Universidad de Córdoba.
 
@@ -14,7 +14,7 @@ El sistema está diseñado para centralizar y automatizar la gestión operativa 
 
 ---
 
-## 🎯 Problemática y Solución
+##  Problemática y Solución
 
 ### La Problemática
 Las cadenas de restaurantes que operan con ventas presenciales y domicilios a menudo enfrentan:
@@ -32,7 +32,7 @@ Se desarrolló un sistema web robusto que garantiza:
 
 ---
 
-## 🏗️ Arquitectura de Software
+##  Arquitectura de Software
 
 El proyecto sigue una arquitectura **Monolítica Modular** basada en el patrón **MVC (Modelo-Vista-Controlador)**, aprovechando la inversión de control de Spring Framework.
 
@@ -55,7 +55,7 @@ El proyecto sigue una arquitectura **Monolítica Modular** basada en el patrón 
 
 ---
 
-## 🛠️ Tecnologías y Herramientas
+##  Tecnologías y Herramientas
 
 | Componente | Tecnología / Versión | Descripción |
 | :--- | :--- | :--- |
@@ -69,7 +69,7 @@ El proyecto sigue una arquitectura **Monolítica Modular** basada en el patrón 
 
 ---
 
-## 🧩 Patrones de Diseño Aplicados
+##  Patrones de Diseño Aplicados
 
 1.  **MVC (Model-View-Controller):** Separación clara entre la interfaz de usuario, la lógica de control y los datos.
 2.  **Repository Pattern:** Abstracción de la capa de datos mediante interfaces `JpaRepository`.
@@ -80,7 +80,7 @@ El proyecto sigue una arquitectura **Monolítica Modular** basada en el patrón 
 
 ---
 
-## 🗄️ Modelo de Datos (Base de Datos)
+##  Modelo de Datos (Base de Datos)
 
 La base de datos `pos_db` consta de **15 tablas** interconectadas. Los puntos clave del modelo son:
 
@@ -97,7 +97,7 @@ La base de datos `pos_db` consta de **15 tablas** interconectadas. Los puntos cl
 
 ---
 
-## 🎨 Guía de Estilo (UI/UX)
+##  Guía de Estilo (UI/UX)
 
 Se implementó un sistema de diseño personalizado (`styles.css`) sobre Bootstrap para ofrecer una experiencia corporativa y profesional.
 
@@ -110,7 +110,7 @@ Se implementó un sistema de diseño personalizado (`styles.css`) sobre Bootstra
 
 ---
 
-## 🚀 Instrucciones de Instalación
+##  Instrucciones de Instalación
 
 ### Prerrequisitos
 1.  Tener instalado **Java JDK 21**.
@@ -143,7 +143,7 @@ Se implementó un sistema de diseño personalizado (`styles.css`) sobre Bootstra
 
 ---
 
-## 👥 Autores
+## Autores
 
 * **José Gil Soto Méndez** - *Ingeniería de Sistemas*
 * **Miguel Guerra Negrete** - *Ingeniería de Sistemas*
