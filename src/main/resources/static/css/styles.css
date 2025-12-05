@@ -179,3 +179,80 @@ div > a.btn-primary:hover, div > a.btn-warning:hover {
     border-color: var(--accent-color);
     box-shadow: 0 0 0 0.25rem rgba(230, 126, 34, 0.25);
 }
+
+/* ============================================================
+   NUEVO LAYOUT: SIDEBAR FIJO + CONTENIDO
+============================================================ */
+
+body {
+    font-size: .875rem;
+    /* Padding top para que el contenido no quede debajo de la navbar fija */
+    padding-top: 3.5rem;
+}
+
+/* --- Navbar Superior --- */
+.navbar-brand {
+    padding-top: .75rem;
+    padding-bottom: .75rem;
+    background-color: rgba(0, 0, 0, .25);
+    box-shadow: inset -1px 0 0 rgba(0, 0, 0, .25);
+}
+.navbar .nav-link {
+    padding-right: 1rem !important;
+    padding-left: 1rem !important;
+}
+
+/* --- Sidebar (Barra Lateral) --- */
+.sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 100; /* Detrás del navbar superior */
+    padding: 48px 0 0; /* Altura del navbar */
+    box-shadow: inset -1px 0 0 rgba(0, 0, 0, .1);
+    background-color: #fff !important; /* Fondo blanco para el sidebar */
+}
+
+.sidebar-sticky {
+    position: relative;
+    top: 0;
+    height: calc(100vh - 48px);
+    padding-top: .5rem;
+    overflow-x: hidden;
+    overflow-y: auto; /* Scroll si el menú es muy largo */
+}
+
+/* Enlaces del Sidebar */
+.sidebar .nav-link {
+    font-weight: 500;
+    color: var(--main-brand); /* Usamos tu color azul oscuro */
+    padding: 0.75rem 1rem;
+    border-radius: 0 25px 25px 0; /* Bordes redondeados a la derecha */
+    margin-right: 10px;
+    transition: all 0.3s;
+}
+
+.sidebar .nav-link:hover {
+    background-color: rgba(230, 126, 34, 0.1); /* Naranja muy suave al pasar mouse */
+    color: var(--accent-color);
+}
+
+.sidebar .nav-link.active {
+    color: var(--accent-color); /* Naranja vibrante para la opción activa */
+    background-color: rgba(230, 126, 34, 0.15);
+    font-weight: 700;
+}
+
+.sidebar-heading {
+    font-size: .75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 1.5rem;
+}
+
+/* Ajustes para la zona de contenido principal */
+main {
+    background-color: var(--bg-body);
+    min-height: 100vh;
+}

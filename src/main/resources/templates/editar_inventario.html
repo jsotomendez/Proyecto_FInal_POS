@@ -1,45 +1,50 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <title>Editar Inventario</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link th:href="@{/css/styles.css}" rel="stylesheet">
-</head>
-<body class="bg-light container mt-5">
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/base :: main-layout(title='Editar Inventario', content=~{::#editar-inventario-content})}">
+<head><title>Ignorar</title></head>
+<body>
+
+<div id="editar-inventario-content">
     <div class="card shadow col-md-6 mx-auto">
-        <div class="card-header bg-warning text-dark"><h4>✏️ Ajustar Stock Manual</h4></div>
+        <div class="card-header bg-warning text-dark">
+            <h4 class="mb-0"><i class="bi bi-pencil-square"></i> Ajustar Stock Manual</h4>
+        </div>
         <div class="card-body">
             <form th:action="@{/web/inventario/guardar}" th:object="${inventario}" method="POST">
                 <input type="hidden" th:field="*{inventarioId}" />
-                
+
                 <div class="mb-3">
-                    <label>Sede (Solo lectura)</label>
-                    <input type="text" class="form-control" th:value="${inventario.sede.nombre}" readonly>
+                    <label class="form-label fw-bold">Sede</label>
+                    <input type="text" class="form-control bg-light" th:value="${inventario.sede.nombre}" readonly>
                 </div>
                 <div class="mb-3">
-                    <label>Producto (Solo lectura)</label>
-                    <input type="text" class="form-control" th:value="${inventario.producto.nombre}" readonly>
+                    <label class="form-label fw-bold">Producto</label>
+                    <input type="text" class="form-control bg-light" th:value="${inventario.producto.nombre}" readonly>
                 </div>
-                
+
                 <div class="row">
                     <div class="col-6 mb-3">
-                        <label>Cantidad</label>
-                        <input type="number" step="0.01" class="form-control fw-bold" th:field="*{cantidad}" required>
+                        <label class="form-label fw-bold">Cantidad</label>
+                        <input type="number" step="0.01" class="form-control fw-bold border-warning" th:field="*{cantidad}" required>
                     </div>
                     <div class="col-6 mb-3">
-                        <label>Unidad</label>
+                        <label class="form-label fw-bold">Unidad</label>
                         <input type="text" class="form-control" th:field="*{unidad}">
                     </div>
                 </div>
 
                 <div class="alert alert-info small">
-                    <i class="bi bi-info-circle"></i> Use esto solo para correcciones de inventario físico.
+                    <i class="bi bi-info-circle-fill"></i> Use esto solo para correcciones de inventario físico.
                 </div>
 
-                <button type="submit" class="btn btn-success w-100">Guardar Cambios</button>
-                <a href="/web/inventario" class="btn btn-secondary w-100 mt-2">Cancelar</a>
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-success">Guardar Cambios</button>
+                    <a href="/web/inventario" class="btn btn-secondary">Cancelar</a>
+                </div>
             </form>
         </div>
     </div>
+</div>
+
 </body>
 </html>

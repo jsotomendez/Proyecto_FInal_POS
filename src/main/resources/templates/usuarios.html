@@ -1,77 +1,68 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <title>Usuarios</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link th:href="@{/css/styles.css}" rel="stylesheet">
-</head>
-<body class="bg-light container mt-5">
-<div class="container mt-3">
-    <div th:if="${mensaje}" class="alert alert-success alert-dismissible fade show" role="alert">
-        <i class="bi bi-check-circle-fill"></i> <span th:text="${mensaje}"></span>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/base :: main-layout(title='Gestión de Usuarios', content=~{::#usuarios-content})}">
+<head><title>Ignorar</title></head>
+<body>
+
+<div id="usuarios-content">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>🔐 Gestión de Usuarios</h2>
+        <div>
+            <a href="/web/usuarios/nuevo" class="btn btn-primary">+ Nuevo Usuario</a>
+        </div>
     </div>
-    <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
-        <i class="bi bi-exclamation-triangle-fill"></i> <span th:text="${error}"></span>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+
+    <div class="card p-3 mb-3 bg-white shadow-sm border-0">
+        <form action="/web/usuarios" method="GET" class="row g-2">
+            <div class="col-md-5">
+                <input type="text" name="username" class="form-control" placeholder="Buscar usuario...">
+            </div>
+            <div class="col-md-5">
+                <select name="rol" class="form-select">
+                    <option value="">-- Todos los Roles --</option>
+                    <option value="ADMIN">Administrador</option>
+                    <option value="CAJERO">Cajero</option>
+                    <option value="GERENTE">Gerente</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-secondary w-100"><i class="bi bi-search"></i> Filtrar</button>
+            </div>
+        </form>
+    </div>
+
+    <div class="table-responsive shadow-sm">
+        <table class="table table-bordered table-hover mb-0 bg-white">
+            <thead class="table-dark">
+            <tr>
+                <th>Username</th>
+                <th>Rol</th>
+                <th>Email</th>
+                <th>Estado</th>
+                <th>Creado</th>
+                <th>Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="u : ${listaUsuarios}">
+                <td th:text="${u.username}" class="fw-bold"></td>
+                <td><span class="badge bg-secondary" th:text="${u.rol}"></span></td>
+                <td th:text="${u.email}"></td>
+                <td>
+                    <span th:if="${u.activo}" class="badge bg-success">Activo</span>
+                    <span th:unless="${u.activo}" class="badge bg-danger">Inactivo</span>
+                </td>
+                <td th:text="${#temporals.format(u.fechaCreacion, 'dd-MM-yyyy')}"></td>
+                <td>
+                    <a th:href="@{/web/usuarios/editar/{id}(id=${u.usuarioId})}" class="btn btn-sm btn-warning text-white"><i class="bi bi-pencil-fill"></i></a>
+                    <a th:href="@{/web/usuarios/eliminar/{id}(id=${u.usuarioId})}" class="btn btn-sm btn-danger" onclick="return confirm('¿Seguro que desea eliminar este usuario?')"><i class="bi bi-trash-fill"></i></a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
     </div>
 </div>
 
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>🔐 Gestión de Usuarios</h2>
-    <div>
-        <a href="/web/usuarios/nuevo" class="btn btn-primary">+ Nuevo Usuario</a>
-        <a href="/" class="btn btn-outline-secondary">Inicio</a>
-    </div>
-</div>
-
-<div class="card p-3 mb-3 bg-light shadow-sm">
-    <form action="/web/usuarios" method="GET" class="row g-2">
-        <div class="col-md-5">
-            <input type="text" name="username" class="form-control" placeholder="Buscar usuario...">
-        </div>
-        <div class="col-md-5">
-            <select name="rol" class="form-select">
-                <option value="">-- Todos los Roles --</option>
-                <option value="ADMIN">Administrador</option>
-                <option value="CAJERO">Cajero</option>
-                <option value="GERENTE">Gerente</option>
-            </select>
-        </div>
-        <div class="col-md-2">
-            <button type="submit" class="btn btn-primary w-100">Filtrar</button>
-        </div>
-    </form>
-</div>
-
-<table class="table table-bordered shadow bg-white">
-    <thead class="table-dark">
-    <tr>
-        <th>Username</th>
-        <th>Rol</th>
-        <th>Email</th>
-        <th>Estado</th>
-        <th>Creado</th>
-        <th>Acciones</th>
-    </tr>
-    </thead>
-    <tbody>
-
-    <tr th:each="u : ${listaUsuarios}">
-        <td th:text="${u.username}" class="fw-bold"></td>
-        <td><span class="badge bg-secondary" th:text="${u.rol}"></span></td>
-        <td th:text="${u.email}"></td>
-        <td>
-            <span th:if="${u.activo}" class="badge bg-success">Activo</span>
-            <span th:unless="${u.activo}" class="badge bg-danger">Inactivo</span>
-        </td>
-        <td th:text="${u.fechaCreacion}"></td>
-        <td>
-            <a th:href="@{/web/usuarios/editar/{id}(id=${u.usuarioId})}" class="btn btn-sm btn-warning">✏️</a>
-            <a th:href="@{/web/usuarios/eliminar/{id}(id=${u.usuarioId})}" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar usuario?')">🗑️</a>
-        </td>
-    </tr>
-    </tbody>
-</table>
 </body>
 </html>

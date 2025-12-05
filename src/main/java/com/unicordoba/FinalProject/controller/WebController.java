@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -37,32 +38,14 @@ public class WebController {
     @Autowired private UsuarioRepository usuarioRepository;
     @Autowired private PromocionRepository promocionRepository;
 
+
     @GetMapping("/")
     public String index(Model model) {
         model.addAttribute("titulo", "Sistema POS - Unicórdoba");
-        return "index";
+        return "redirect:/web/dashboard";
     }
 
-    /*
-    @GetMapping("/web/dashboard")
-    public String dashboard(Model model) {
-        DashboardDTO stats = new DashboardDTO();
-        stats.setTotalVentasDia(pedidoRepository.contarVentasHoy());
-        stats.setIngresosDia(pedidoRepository.sumarIngresosHoy());
-        stats.setProductosBajoStock(inventarioRepository.contarProductosBajoStock());
-        stats.setClientesRegistrados(clienteRepository.count());
-        model.addAttribute("stats", stats);
 
-        List<Object[]> ventasData = pedidoRepository.obtenerVentasUltimosDias();
-        model.addAttribute("graficoVentas", ventasData);
-
-        List<Object[]> productosTop = orderItemRepository.obtenerProductosMasVendidos();
-        model.addAttribute("graficoProductos", productosTop);
-
-        return "dashboard";
-    }
-
-     */
 
     @GetMapping("/web/dashboard")
     public String dashboard(Model model) {
@@ -177,6 +160,11 @@ public class WebController {
         return "redirect:/web/clientes";
     }
 
+    @GetMapping("/web/clientes/nuevo")
+    public String formCliente(Model model) {
+        model.addAttribute("cliente", new Cliente());
+        return "nuevo_cliente";
+    }
 
     @GetMapping("/web/sedes")
     public String listarSedes(
@@ -483,8 +471,11 @@ public class WebController {
         try {
             usuarioService.eliminar(id);
             redirectAttrs.addFlashAttribute("mensaje", "Usuario eliminado correctamente.");
+        } catch (DataIntegrityViolationException e) {
+            // Este es el error específico cuando hay llaves foráneas (facturas, pedidos)
+            redirectAttrs.addFlashAttribute("error", "🚫 No se puede eliminar: El usuario tiene ventas o registros asociados en el sistema.");
         } catch (Exception e) {
-            redirectAttrs.addFlashAttribute("error", "No se puede eliminar: El usuario tiene ventas o registros asociados.");
+            redirectAttrs.addFlashAttribute("error", "Error inesperado al eliminar el usuario.");
         }
         return "redirect:/web/usuarios";
     }
