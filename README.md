@@ -1,20 +1,21 @@
-#  Sistema POS Web - Gestión Integral para Restaurantes y Retail
+# Sistema POS Web - Gestión Integral para Restaurantes y Retail
 
 ![Java](https://img.shields.io/badge/Java-21-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.5.8-6DB33F?style=for-the-badge&logo=spring-boot&logoColor=white)
 ![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?style=for-the-badge&logo=mysql&logoColor=white)
 ![Thymeleaf](https://img.shields.io/badge/Thymeleaf-Frontend-005F0F?style=for-the-badge&logo=thymeleaf&logoColor=white)
 ![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3-7952B3?style=for-the-badge&logo=bootstrap&logoColor=white)
+![Railway](https://img.shields.io/badge/Railway-Deploy-0B0D0E?style=for-the-badge&logo=railway&logoColor=white)
 
-##  Descripción del Proyecto
+## Descripción del Proyecto
 
-Este proyecto es una **Plataforma de Punto de Venta (POS)** basada en la web, desarrollada como proyecto final para las asignaturas de **Base de Datos 2** y **Programación 3** de la carrera de Ingeniería de Sistemas en la Universidad de Córdoba.
+Este proyecto es una **Plataforma de Punto de Venta (POS)** basada en la web, desarrollada como proyecto final para la asignatura de **Programación 3** de la carrera de Ingeniería de Sistemas en la Universidad de Córdoba.
 
 El sistema está diseñado para centralizar y automatizar la gestión operativa de cadenas de restaurantes o comercios con múltiples sedes. Permite el control en tiempo real de inventarios, facturación electrónica, gestión de proveedores y análisis de ventas, resolviendo la problemática de la fragmentación de datos y la falta de trazabilidad en los negocios tradicionales.
 
 ---
 
-##  Problemática y Solución
+## Problemática y Solución
 
 ### La Problemática
 Las cadenas de restaurantes que operan con ventas presenciales y domicilios a menudo enfrentan:
@@ -28,11 +29,11 @@ Se desarrolló un sistema web robusto que garantiza:
 1.  **Integridad de Datos:** Uso de una base de datos relacional normalizada para asegurar la consistencia.
 2.  **Automatización:** El inventario se descuenta automáticamente con cada venta y se suma con cada compra.
 3.  **Toma de Decisiones:** Un Dashboard gerencial con KPIs y gráficos en tiempo real.
-4.  **Escalabilidad:** Arquitectura preparada para soportar múltiples sedes y usuarios concurrentes.
+4.  **Escalabilidad:** Arquitectura preparada para soportar múltiples sedes y usuarios concurrentes en la nube.
 
 ---
 
-##  Arquitectura de Software
+## Arquitectura de Software
 
 El proyecto sigue una arquitectura **Monolítica Modular** basada en el patrón **MVC (Modelo-Vista-Controlador)**, aprovechando la inversión de control de Spring Framework.
 
@@ -55,7 +56,7 @@ El proyecto sigue una arquitectura **Monolítica Modular** basada en el patrón 
 
 ---
 
-##  Tecnologías y Herramientas
+## Tecnologías y Herramientas
 
 | Componente | Tecnología / Versión | Descripción |
 | :--- | :--- | :--- |
@@ -65,22 +66,21 @@ El proyecto sigue una arquitectura **Monolítica Modular** basada en el patrón 
 | **Gestor de Dependencias** | Maven | Gestión de librerías y ciclo de vida de construcción. |
 | **Frontend** | Thymeleaf + Bootstrap 5 | Motor de plantillas y framework CSS responsivo. |
 | **Gráficos** | Chart.js | Librería JS para visualización de datos en el Dashboard. |
-| **Herramientas Dev** | IntelliJ IDEA, Postman | Entorno de desarrollo y pruebas de API. |
+| **Despliegue** | Railway | Plataforma PaaS para el hosting de la aplicación y base de datos. |
 
 ---
 
-##  Patrones de Diseño Aplicados
+## Despliegue en la Nube (Railway)
 
-1.  **MVC (Model-View-Controller):** Separación clara entre la interfaz de usuario, la lógica de control y los datos.
-2.  **Repository Pattern:** Abstracción de la capa de datos mediante interfaces `JpaRepository`.
-3.  **Service Layer Pattern:** Capa intermedia para lógica de negocio compleja y transaccionalidad (`@Transactional`).
-4.  **DTO (Data Transfer Object):** Transferencia de datos eficiente entre el frontend y el backend sin exponer las entidades JPA directamente.
-5.  **Singleton:** Gestión de Beans de Spring (Controladores y Servicios) como instancias únicas.
-6.  **Dependency Injection (DI):** Desacoplamiento de componentes mediante `@Autowired`.
+Este proyecto está configurado para ser desplegado fácilmente en **Railway**.
+
+1.  **Base de Datos:** Se utiliza el servicio de MySQL proporcionado por Railway.
+2.  **Configuración:** La aplicación detecta automáticamente las variables de entorno (`MYSQLHOST`, `MYSQLPORT`, `MYSQLUSER`, etc.) para la conexión en la nube.
+3.  **Puerto Dinámico:** Se ha configurado `server.port=${PORT:8080}` para adaptarse al puerto asignado por la plataforma.
 
 ---
 
-##  Modelo de Datos (Base de Datos)
+## Modelo de Datos (Base de Datos)
 
 La base de datos `pos_db` consta de **15 tablas** interconectadas. Los puntos clave del modelo son:
 
@@ -97,7 +97,7 @@ La base de datos `pos_db` consta de **15 tablas** interconectadas. Los puntos cl
 
 ---
 
-##  Guía de Estilo (UI/UX)
+## Guía de Estilo (UI/UX)
 
 Se implementó un sistema de diseño personalizado (`styles.css`) sobre Bootstrap para ofrecer una experiencia corporativa y profesional.
 
@@ -110,7 +110,7 @@ Se implementó un sistema de diseño personalizado (`styles.css`) sobre Bootstra
 
 ---
 
-##  Instrucciones de Instalación
+## Instrucciones de Instalación (Local)
 
 ### Prerrequisitos
 1.  Tener instalado **Java JDK 21**.
@@ -147,7 +147,7 @@ Se implementó un sistema de diseño personalizado (`styles.css`) sobre Bootstra
 
 * **José Gil Soto Méndez** - *Ingeniería de Sistemas*
 * **Miguel Guerra Negrete** - *Ingeniería de Sistemas*
-* **Andres Luna Moreno** - *Ingeniería de Sistemas*
+* **Andrés Luna Moreno** - *Ingeniería de Sistemas*
 
 **Universidad de Córdoba** - Montería, Colombia  
-*Noviembre 2025* 
+*2025*
