@@ -14,13 +14,91 @@
         <div class="col-md-4"><div class="card shadow"><div class="card-body"><canvas id="chartProductos"></canvas></div></div></div>
     </div>
     <script th:inline="javascript">
-        var fechas = /*[[${graficoVentas}]]*/ [].map(x=>x[0]).reverse();
-        var totales = /*[[${graficoVentas}]]*/ [].map(x=>x[1]).reverse();
-        new Chart(document.getElementById('chartVentas'), {type:'line', data:{labels:fechas, datasets:[{label:'Ingresos', data:totales, borderColor:'#e67e22', backgroundColor:'rgba(230,126,34,0.1)', fill:true}]}});
+        /*<![CDATA[*/
+        document.addEventListener("DOMContentLoaded", function() {
+            // 1. Obtener datos de Java con seguridad (si es null, usa array vacío)
+            var ventasDataRaw = /*[[${graficoVentas}]]*/ [];
+            var productosDataRaw = /*[[${graficoProductos}]]*/ [];
 
-        var pNom = /*[[${graficoProductos}]]*/ [].map(x=>x[0]);
-        var pCant = /*[[${graficoProductos}]]*/ [].map(x=>x[1]);
-        new Chart(document.getElementById('chartProductos'), {type:'doughnut', data:{labels:pNom, datasets:[{data:pCant, backgroundColor:['#2c3e50','#e67e22','#34495e','#d35400','#95a5a6']}]}});
+            console.log("Datos Ventas:", ventasDataRaw); // Para depurar en consola
+            console.log("Datos Productos:", productosDataRaw);
+
+            // --- GRÁFICO DE VENTAS (LINEAL) ---
+            var ctxVentas = document.getElementById('chartVentas');
+            if (ctxVentas) {
+                // Si no hay datos, ponemos valores por defecto para que se vea algo
+                var fechas = ventasDataRaw.length ? ventasDataRaw.map(x => x[0]) : ["Sin datos"];
+                var totales = ventasDataRaw.length ? ventasDataRaw.map(x => x[1]) : [0];
+
+                // Invertimos para que salga cronológico (de izquierda a derecha)
+                if(ventasDataRaw.length) {
+                    fechas = fechas.reverse();
+                    totales = totales.reverse();
+                }
+
+                new Chart(ctxVentas, {
+                    type: 'line',
+                    data: {
+                        labels: fechas,
+                        datasets: [{
+                            label: 'Ingresos ($)',
+                            data: totales,
+                            borderColor: '#e67e22', // Naranja corporativo
+                            backgroundColor: 'rgba(230, 126, 34, 0.1)',
+                            borderWidth: 3,
+                            pointBackgroundColor: '#2c3e50', // Azul corporativo
+                            pointRadius: 4,
+                            fill: true,
+                            tension: 0.3 // Suavizado de curvas
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: { borderDash: [5, 5] },
+                                ticks: { callback: function(value) { return '$' + value; } }
+                            },
+                            x: { grid: { display: false } }
+                        }
+                    }
+                });
+            }
+
+            // --- GRÁFICO DE PRODUCTOS (DONA) ---
+            var ctxProductos = document.getElementById('chartProductos');
+            if (ctxProductos) {
+                var pNom = productosDataRaw.length ? productosDataRaw.map(x => x[0]) : ["Sin ventas"];
+                var pCant = productosDataRaw.length ? productosDataRaw.map(x => x[1]) : [1]; // 1 ficticio para que se vea el círculo gris
+                var colores = productosDataRaw.length
+                    ? ['#2c3e50', '#e67e22', '#16a085', '#c0392b', '#8e44ad'] // Colores reales
+                    : ['#bdc3c7']; // Color gris si no hay datos
+
+                new Chart(ctxProductos, {
+                    type: 'doughnut',
+                    data: {
+                        labels: pNom,
+                        datasets: [{
+                            data: pCant,
+                            backgroundColor: colores,
+                            borderWidth: 0,
+                            hoverOffset: 4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20 } }
+                        }
+                    }
+                });
+            }
+        });
+        /*]]>*/
     </script>
 </div>
 </body>

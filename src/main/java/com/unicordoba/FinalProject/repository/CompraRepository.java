@@ -12,8 +12,8 @@ import java.util.List;
 public interface CompraRepository extends JpaRepository<Compra, Integer> {
 
     @Query("SELECT c FROM Compra c WHERE " +
-            "(:fechaInicio IS NULL OR DATE(c.fecha) >= :fechaInicio) AND " +
-            "(:fechaFin IS NULL OR DATE(c.fecha) <= :fechaFin) AND " +
+            "(:fechaInicio IS NULL OR CAST(c.fecha AS date) >= :fechaInicio) AND " +
+            "(:fechaFin IS NULL OR CAST(c.fecha AS date) <= :fechaFin) AND " +
             "(:proveedorId IS NULL OR c.proveedor.proveedorId = :proveedorId)")
     List<Compra> filtrarCompras(
             @Param("fechaInicio") LocalDate fechaInicio,

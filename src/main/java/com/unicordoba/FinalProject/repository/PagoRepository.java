@@ -12,8 +12,8 @@ import java.util.List;
 public interface PagoRepository extends JpaRepository<Pago, Integer> {
 
     @Query("SELECT p FROM Pago p WHERE " +
-            "(:fechaInicio IS NULL OR DATE(p.fechaHora) >= :fechaInicio) AND " +
-            "(:fechaFin IS NULL OR DATE(p.fechaHora) <= :fechaFin) AND " +
+            "(:fechaInicio IS NULL OR CAST(p.fechaHora AS date) >= :fechaInicio) AND " +
+            "(:fechaFin IS NULL OR CAST(p.fechaHora AS date) <= :fechaFin) AND " +
             "(:metodo IS NULL OR p.metodoPago = :metodo)")
     List<Pago> filtrarPagos(
             @Param("fechaInicio") LocalDate fechaInicio,

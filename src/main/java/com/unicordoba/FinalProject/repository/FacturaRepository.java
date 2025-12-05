@@ -11,9 +11,10 @@ import java.util.List;
 @Repository
 public interface FacturaRepository extends JpaRepository<Factura, Integer> {
 
+    // Usamos CAST(.. as date) que es más estándar en Hibernate o comparamos rangos
     @Query("SELECT f FROM Factura f WHERE " +
-            "(:fechaInicio IS NULL OR DATE(f.fechaEmision) >= :fechaInicio) AND " +
-            "(:fechaFin IS NULL OR DATE(f.fechaEmision) <= :fechaFin) AND " +
+            "(:fechaInicio IS NULL OR CAST(f.fechaEmision AS date) >= :fechaInicio) AND " +
+            "(:fechaFin IS NULL OR CAST(f.fechaEmision AS date) <= :fechaFin) AND " +
             "(:estado IS NULL OR f.estado = :estado)")
     List<Factura> filtrarFacturas(
             @Param("fechaInicio") LocalDate fechaInicio,
